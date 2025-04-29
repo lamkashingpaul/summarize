@@ -1,0 +1,12 @@
+{
+  "cSpell.words": [
+    "deepseek",
+    "dotenv",
+    "gmtime",
+    "levelname",
+    "pgadmin",
+    "poolclass",
+    "slowapi"
+  ],
+  "python.analysis.extraPaths": ["./api"]
+}
