@@ -5,6 +5,7 @@
     "gmtime",
     "levelname",
     "pgadmin",
+    "pgvector",
     "poolclass",
     "slowapi"
   ],
