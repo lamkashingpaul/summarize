@@ -1,4 +1,4 @@
-from src.databases.base import Base
+from src.database.models import Base
 from sqlalchemy import DateTime, func, text
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID, TEXT, ARRAY

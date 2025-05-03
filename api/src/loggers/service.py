@@ -1,4 +1,4 @@
-from src.settings.base import settings
+from src.settings.service import settings
 import logging
 import logging.config
 import time

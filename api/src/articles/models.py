@@ -1,15 +1,20 @@
 from datetime import datetime
 import uuid
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy import DateTime, func, text
-from src.databases.base import Base
+from src.database.models import Base
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID, TEXT, ARRAY, JSONB
 
 
 class Note(BaseModel):
-    note: str
-    pageNumbers: list[int]
+    note: str = Field(..., description="The note extracted from the article.")
+    page_numbers: list[int] = Field(
+        ..., description="List of page numbers where the note is found."
+    )
+
+    def __repr__(self):
+        return f"Note(note={self.note}, page_numbers={self.page_numbers})"
 
 
 class Article(Base):

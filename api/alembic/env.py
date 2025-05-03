@@ -5,9 +5,9 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from src.settings.base import settings
+from src.settings.service import settings
+from src.database.models import Base
 
-from src.databases.base import Base
 from src.articles.models import Article
 from src.embeddings.models import Embedding
 from src.question_and_answers.models import QuestionAndAnswer
