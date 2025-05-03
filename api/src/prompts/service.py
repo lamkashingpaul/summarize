@@ -1,31 +1,22 @@
 from langchain_core.prompts.chat import ChatPromptTemplate
 from langchain_core.messages import AIMessageChunk
-from langchain_core.tools import tool
-from pydantic import BaseModel, Field
 from src.articles.models import Note
+from langchain_core.tools import tool
 
 notes_prompt = ChatPromptTemplate.from_messages(
     [
         (
             "ai",
             """
-            Please read and summarize the following article. Generate notes that cover the entire article, ensuring that a complete understanding is guaranteed after reading all the notes. Each note should be structured as follows:
+            You are a summarization assistant. Your task is to read the article and extract key notes directly.
 
-            - A summary of a key point or concept discussed in the article.
-            - Include the page numbers where the information can be found.
+            If the article is long, create multiple concise notes, each focused on a specific topic.
+            Summarize the content in your own words; do not copy text from the article.
+            Ensure that all notes together comprehensively cover the entire article.
+            For each note, include the text and the corresponding page numbers.
+            You should format the note and page numbers into a structured format.
 
-            The notes should be in this format:
-
-            [
-                {{
-                    "note": "The author discusses the importance of XYZ in the context of ABC.",
-                    "page_numbers": [1, 2]
-                }},
-                {{
-                    "note": "The author describes the method used to measure XYZ.",
-                    "page_numbers": [3]
-                }}
-            ]
+            Begin summarizing the article now.
             """,
         ),
         ("human", "Article: {article}"),
@@ -33,11 +24,17 @@ notes_prompt = ChatPromptTemplate.from_messages(
 )
 
 
-class format_notes(BaseModel):
-    note: str = Field(..., description="The note extracted from the article.")
-    page_numbers: list[int] = Field(
-        ..., description="List of page numbers where the note is found."
-    )
+@tool
+def format_note(note: str, page_numbers: list[int]) -> str:
+    """
+    Format the note and page numbers into a structured format.
+    Args:
+        note (str): The note text.
+        page_numbers (list[int]): The list of page numbers associated with the note.
+    Returns:
+        str: The formatted note and page numbers.
+    """
+    return f"Note: {note}\nPage Numbers: {', '.join(map(str, page_numbers))}"
 
 
 def format_output(output: AIMessageChunk) -> list[Note]:
@@ -45,7 +42,7 @@ def format_output(output: AIMessageChunk) -> list[Note]:
     notes: list[Note] = []
 
     for toolCall in toolCalls:
-        if toolCall["name"] == format_notes.__name__:
+        if toolCall["name"] == format_note.name:
             note = toolCall["args"]["note"]
             page_numbers = toolCall["args"]["page_numbers"]
             notes.append(Note(note=note, page_numbers=page_numbers))

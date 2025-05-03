@@ -25,13 +25,13 @@ async def create_article(article: ArticleCreate):
     downloaded_article = await download_article(url)
 
     if page_numbers_to_delete:
-        downloaded_article = await delete_page_numbers_from_pdf(
+        downloaded_article = delete_page_numbers_from_pdf(
             downloaded_article, page_numbers_to_delete
         )
 
-    documents = await convert_pdf_to_documents(downloaded_article)
+    documents = convert_pdf_to_documents(downloaded_article)
 
-    notes = await generate_notes(documents)
+    notes = generate_notes(documents)
 
     return {
         "notes": notes,
