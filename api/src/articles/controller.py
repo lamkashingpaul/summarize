@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from src.articles.schemas import ArticleCreate
+from src.articles.schemas import ArticleCreate, CreateArticleResponse
 from src.articles.service import (
     convert_pdf_to_documents,
     delete_page_numbers_from_pdf,
@@ -11,7 +11,7 @@ articles_router = APIRouter(prefix="/articles", tags=["articles"])
 
 
 @articles_router.post("")
-async def create_article(article: ArticleCreate):
+async def create_article(article: ArticleCreate) -> CreateArticleResponse:
     name = article.name
     url = article.url
     page_numbers_to_delete = article.page_numbers_to_delete
@@ -31,8 +31,6 @@ async def create_article(article: ArticleCreate):
 
     documents = convert_pdf_to_documents(downloaded_article)
 
-    notes = generate_notes(documents)
+    notes = await generate_notes(documents)
 
-    return {
-        "notes": notes,
-    }
+    return CreateArticleResponse(notes=notes)

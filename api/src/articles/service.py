@@ -1,12 +1,11 @@
 import tempfile
 import aiohttp
-from langchain_cohere import ChatCohere
-from langchain_cohere import ChatCohere
 import pymupdf
 from src.prompts.service import format_note, format_output, notes_prompt
 from langchain_core.documents import Document
 from src.articles.models import Note
 from langchain_unstructured import UnstructuredLoader
+from langchain_deepseek import ChatDeepSeek
 
 
 async def download_article(url: str) -> bytes:
@@ -40,27 +39,24 @@ def convert_pdf_to_documents(pdf_data: bytes) -> list[Document]:
         partition_via_api=True,
     )
 
-    documents: list[Document] = []
-    for doc in loader.lazy_load():
-        documents.append(doc)
-
+    documents = [doc for doc in loader.lazy_load()]
     return documents
 
 
-def generate_notes(documents: list[Document]) -> list[Note]:
+async def generate_notes(documents: list[Document]):
     documentsAsString = "\n".join(doc.page_content for doc in documents)
-    model = ChatCohere(
-        model="command-a-03-2025",
+    model = ChatDeepSeek(
+        model="deepseek-chat",
         temperature=0,
     )
 
     model_with_tools = model.bind_tools(
         tools=[format_note],
-        tool_choice="REQUIRED",
+        tool_choice="any",
     )
 
     chain = notes_prompt | model_with_tools | format_output
 
-    response = chain.invoke({"article": documentsAsString})
+    response = await chain.ainvoke({"article": documentsAsString})
 
     return response

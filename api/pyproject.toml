@@ -9,6 +9,7 @@ dependencies = [
     "fastapi[standard]>=0.115.12",
     "langchain-cohere>=0.4.4",
     "langchain-community>=0.3.23",
+    "langchain-deepseek>=0.1.3",
     "langchain-unstructured>=0.1.5",
     "pdfminer-six>=20250416",
     "pgvector>=0.4.1",
