@@ -1,16 +1,12 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-
 from alembic import context
-
-from src.settings.service import settings
-from src.database.models import Base
-
+from sqlalchemy import engine_from_config, pool
 from src.articles.models import Article
+from src.database.models import Base
 from src.embeddings.models import Embedding
 from src.question_and_answers.models import QuestionAndAnswer
+from src.settings.service import settings
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -25,7 +21,12 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = Base.metadata
+target_metadata = [
+    Base.metadata,
+    Article.metadata,
+    Embedding.metadata,
+    QuestionAndAnswer.metadata,
+]
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

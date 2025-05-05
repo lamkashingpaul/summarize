@@ -1,5 +1,6 @@
 {
   "cSpell.words": [
+    "ainvoke",
     "deepseek",
     "dotenv",
     "getbuffer",
@@ -8,6 +9,7 @@
     "pgadmin",
     "pgvector",
     "poolclass",
+    "sessionmaker",
     "slowapi"
   ],
   "python.analysis.extraPaths": ["./api"]

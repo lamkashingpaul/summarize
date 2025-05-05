@@ -1,11 +1,17 @@
 import tempfile
+
 import aiohttp
 import pymupdf
-from src.prompts.service import format_note, format_output, notes_prompt
 from langchain_core.documents import Document
-from src.articles.models import Note
-from langchain_unstructured import UnstructuredLoader
 from langchain_deepseek import ChatDeepSeek
+from langchain_unstructured import UnstructuredLoader
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.articles.models import Article, Note
+from src.articles.schemas import CreateArticleDto
+from src.database.service import SessionDep
+from src.prompts.service import format_note, format_output, notes_prompt
 
 
 async def download_article(url: str) -> bytes:
@@ -43,11 +49,11 @@ def convert_pdf_to_documents(pdf_data: bytes) -> list[Document]:
     return documents
 
 
-async def generate_notes(documents: list[Document]):
+async def generate_notes(documents: list[Document]) -> list[Note]:
     documentsAsString = "\n".join(doc.page_content for doc in documents)
     model = ChatDeepSeek(
         model="deepseek-chat",
-        temperature=0,
+        temperature=0.0,
     )
 
     model_with_tools = model.bind_tools(
@@ -60,3 +66,15 @@ async def generate_notes(documents: list[Document]):
     response = await chain.ainvoke({"article": documentsAsString})
 
     return response
+
+
+def save_article(create_article_dto: CreateArticleDto, session: SessionDep):
+    article = Article(**create_article_dto.model_dump())
+    session.add(article)
+    return article
+
+
+async def fetch_article(article_id: str, session: AsyncSession) -> Article:
+    statement = select(Article).where(Article.id == article_id).limit(2)
+    article = (await session.scalars(statement)).one()
+    return article

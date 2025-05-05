@@ -1,7 +1,8 @@
-from langchain_core.prompts.chat import ChatPromptTemplate
 from langchain_core.messages import AIMessageChunk
-from src.articles.models import Note
+from langchain_core.prompts.chat import ChatPromptTemplate
 from langchain_core.tools import tool
+
+from src.articles.models import Note
 
 notes_prompt = ChatPromptTemplate.from_messages(
     [

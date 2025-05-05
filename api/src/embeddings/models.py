@@ -1,10 +1,12 @@
-from datetime import datetime
 import uuid
-from sqlalchemy import DateTime, func, text
-from src.database.models import Base
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy.dialects.postgresql import UUID, TEXT, JSONB
+from datetime import datetime
+
 from pgvector.sqlalchemy import Vector
+from sqlalchemy import DateTime, func, text
+from sqlalchemy.dialects.postgresql import JSONB, TEXT, UUID
+from sqlalchemy.orm import Mapped, mapped_column
+
+from src.database.models import Base
 
 
 class Embedding(Base):

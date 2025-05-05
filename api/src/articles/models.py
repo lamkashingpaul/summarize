@@ -1,10 +1,12 @@
-from datetime import datetime
 import uuid
+from datetime import datetime
+
 from pydantic import BaseModel, Field
 from sqlalchemy import DateTime, func, text
-from src.database.models import Base
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB, TEXT, UUID
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy.dialects.postgresql import UUID, TEXT, ARRAY, JSONB
+
+from src.database.models import Base
 
 
 class Note(BaseModel):

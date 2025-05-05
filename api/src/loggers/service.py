@@ -1,7 +1,8 @@
-from src.settings.service import settings
 import logging
 import logging.config
 import time
+
+from src.settings.service import settings
 
 
 class UTCFormatter(logging.Formatter):
