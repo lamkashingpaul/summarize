@@ -1,11 +1,19 @@
-from fastapi import APIRouter, HTTPException
+from typing import Annotated
 
-from src.articles.schemas import ArticleCreate, CreateArticleDto, CreateArticleResponse
+from fastapi import APIRouter, HTTPException, Query
+
+from src.articles.schemas import (
+    ArticleCreate,
+    ArticlesFindParams,
+    CreateArticleDto,
+    CreateArticleResponse,
+)
 from src.articles.service import (
     convert_pdf_to_documents,
     delete_page_numbers_from_pdf,
     download_article,
-    fetch_article,
+    fetch_article_or_fail,
+    find_articles,
     generate_notes,
     save_article,
 )
@@ -29,6 +37,14 @@ async def create_article(
             detail={"message": "Invalid URL. Only arXiv PDF URLs are supported."},
         )
 
+    find_articles_query = ArticlesFindParams(url=url, offset=0, limit=1)
+    existing_articles = await find_articles(query=find_articles_query, session=session)
+    if existing_articles:
+        raise HTTPException(
+            status_code=400,
+            detail={"message": "Article already exists."},
+        )
+
     downloaded_article = await download_article(url)
     if page_numbers_to_delete:
         downloaded_article = delete_page_numbers_from_pdf(
@@ -48,17 +64,22 @@ async def create_article(
         ),
         session=session,
     )
-    save_embeddings(
-        documents=documents,
-        url=url,
-        session=session,
-    )
+    save_embeddings(documents=documents, url=url, session=session)
     await session.commit()
 
     return CreateArticleResponse(notes=notes)
 
 
 @articles_router.get("/{article_id}")
-async def get_articles(article_id: str, session: SessionDep):
-    article = await fetch_article(article_id=article_id, session=session)
+async def get_article_by_id(article_id: str, session: SessionDep):
+    article = await fetch_article_or_fail(article_id=article_id, session=session)
     return {"article": article}
+
+
+@articles_router.get("")
+async def get_articles(
+    query: Annotated[ArticlesFindParams, Query()],
+    session: SessionDep,
+):
+    articles = await find_articles(query=query, session=session)
+    return {"articles": articles}

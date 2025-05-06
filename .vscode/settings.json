@@ -1,16 +1,24 @@
 {
   "cSpell.words": [
     "ainvoke",
+    "aiohttp",
+    "asyncpg",
     "deepseek",
     "dotenv",
+    "fastapi",
     "getbuffer",
     "gmtime",
+    "langchain",
     "levelname",
     "pgadmin",
     "pgvector",
     "poolclass",
+    "pydantic",
+    "pymupdf",
+    "pytest",
     "sessionmaker",
-    "slowapi"
+    "slowapi",
+    "sqlalchemy"
   ],
   "python.analysis.extraPaths": ["./api"]
 }

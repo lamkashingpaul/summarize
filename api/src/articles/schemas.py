@@ -18,3 +18,9 @@ class CreateArticleDto(BaseModel):
 
 class CreateArticleResponse(BaseModel):
     notes: list[Note] = Field(default=[])
+
+
+class ArticlesFindParams(BaseModel):
+    url: str = Field("", max_length=255)
+    offset: int = Field(0, ge=0)
+    limit: int = Field(10, gt=0, le=50)

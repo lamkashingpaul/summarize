@@ -9,7 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.articles.models import Article, Note
-from src.articles.schemas import CreateArticleDto
+from src.articles.schemas import ArticlesFindParams, CreateArticleDto
 from src.database.service import SessionDep
 from src.prompts.service import format_note, format_output, notes_prompt
 
@@ -46,16 +46,12 @@ def convert_pdf_to_documents(pdf_data: bytes) -> list[Document]:
 
 
 async def generate_notes(documents: list[Document]) -> list[Note]:
-    documentsAsString = "\n".join(doc.page_content for doc in documents)
-    model = ChatDeepSeek(
-        model="deepseek-chat",
-        temperature=0.0,
+    documentsAsString = "\n".join(
+        f"Page {doc.metadata['page'] + 1}: {doc.page_content}" for doc in documents
     )
+    model = ChatDeepSeek(model="deepseek-chat", temperature=0.0)
 
-    model_with_tools = model.bind_tools(
-        tools=[format_note],
-        tool_choice="any",
-    )
+    model_with_tools = model.bind_tools(tools=[format_note], tool_choice="any")
 
     chain = notes_prompt | model_with_tools | format_output
 
@@ -70,7 +66,20 @@ def save_article(create_article_dto: CreateArticleDto, session: SessionDep):
     return article
 
 
-async def fetch_article(article_id: str, session: AsyncSession) -> Article:
+async def fetch_article_or_fail(article_id: str, session: AsyncSession) -> Article:
     statement = select(Article).where(Article.id == article_id).limit(2)
     article = (await session.scalars(statement)).one()
     return article
+
+
+async def find_articles(query: ArticlesFindParams, session: SessionDep):
+    url = query.url
+    offset = query.offset
+    limit = query.limit
+
+    statement = select(Article).offset(offset).limit(limit)
+    if url:
+        statement = statement.where(Article.url == url)
+
+    articles = (await session.scalars(statement)).all()
+    return articles

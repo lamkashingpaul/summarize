@@ -9,13 +9,15 @@ notes_prompt = ChatPromptTemplate.from_messages(
         (
             "ai",
             """
-            You are a summarization assistant. Your task is to read the article and extract key notes directly.
+            You are a summarization assistant.
 
-            If the article is long, create multiple concise notes, each focused on a specific topic.
-            Summarize the content in your own words; do not copy text from the article.
-            Ensure that all notes together comprehensively cover the entire article.
-            For each note, include the text and the corresponding page numbers.
-            You should format the note and page numbers into a structured format.
+            Your task is to read the article and extract key notes directly.
+
+            If the article is long, create multiple notes, each focused on a specific section or main idea for that page. Summarize the content in your own words with text referenced from the article.
+
+            Make sure enough notes are summarized such that all notes together comprehensively cover the entire article.
+
+            For each note, include the summarized text and the corresponding page numbers. Format the notes and page numbers into a structured format.
 
             Begin summarizing the article now.
             """,
