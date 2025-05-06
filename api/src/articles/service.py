@@ -2,9 +2,9 @@ import tempfile
 
 import aiohttp
 import pymupdf
+from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_core.documents import Document
 from langchain_deepseek import ChatDeepSeek
-from langchain_unstructured import UnstructuredLoader
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -39,11 +39,7 @@ def convert_pdf_to_documents(pdf_data: bytes) -> list[Document]:
         temp_file.write(pdf_data)
         temp_file_path = temp_file.name
 
-    loader = UnstructuredLoader(
-        file_path=temp_file_path,
-        strategy="hi_res",
-        partition_via_api=True,
-    )
+    loader = PyMuPDFLoader(temp_file_path)
 
     documents = [doc for doc in loader.lazy_load()]
     return documents
