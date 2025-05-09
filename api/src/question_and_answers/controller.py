@@ -31,6 +31,7 @@ async def ask_question(
         session=session,
     )
 
+    await session.commit()
     return QuestionAskResponse(
         answer=answer,
         followup_questions=followup_questions,

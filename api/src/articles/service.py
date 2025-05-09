@@ -1,17 +1,21 @@
 import tempfile
+from uuid import UUID
 
 import aiohttp
 import pymupdf
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_core.documents import Document
 from langchain_deepseek import ChatDeepSeek
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from sqlalchemy import select
+from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.articles.models import Article, Note
 from src.articles.schemas import ArticlesFindParams, CreateArticleDto
 from src.database.service import SessionDep
-from src.prompts.service import format_note, format_output, notes_prompt
+from src.errors.models import CustomDatabaseNotFoundException
+from src.prompts.service import format_note, format_output_notes, notes_prompt
 
 
 async def download_article(url: str) -> bytes:
@@ -40,36 +44,59 @@ def convert_pdf_to_documents(pdf_data: bytes) -> list[Document]:
         temp_file_path = temp_file.name
 
     loader = PyMuPDFLoader(temp_file_path)
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1000,
+        chunk_overlap=200,
+        separators=["\n\n", "\n", " ", ""],
+    )
+    documents = []
 
-    documents = [doc for doc in loader.lazy_load()]
+    for document in loader.lazy_load():
+        cleaned_content = " ".join(
+            line for line in map(str.strip, document.page_content.split("\n")) if line
+        ).replace("  ", " ")
+
+        document.page_content = cleaned_content.replace(". ", ".\n\n")
+        chunks = text_splitter.split_documents([document])
+        for chunk in chunks:
+            chunk.metadata["page"] = document.metadata["page"]
+            documents.append(chunk)
+
     return documents
 
 
 async def generate_notes(documents: list[Document]) -> list[Note]:
-    documentsAsString = "\n".join(
-        f"Page {doc.metadata['page'] + 1}: {doc.page_content}" for doc in documents
+    documents_as_string = "\n\n".join(
+        f"<<Content of Page {doc.metadata['page'] + 1}>>\n{doc.page_content}"
+        for doc in documents
     )
     model = ChatDeepSeek(model="deepseek-chat", temperature=0.0)
 
     model_with_tools = model.bind_tools(tools=[format_note], tool_choice="any")
 
-    chain = notes_prompt | model_with_tools | format_output
+    chain = notes_prompt | model_with_tools | format_output_notes
 
-    response = await chain.ainvoke({"article": documentsAsString})
+    response = await chain.ainvoke({"article": documents_as_string})
 
     return response
 
 
-def save_article(create_article_dto: CreateArticleDto, session: SessionDep):
+async def save_article(create_article_dto: CreateArticleDto, session: SessionDep):
     article = Article(**create_article_dto.model_dump())
     session.add(article)
     return article
 
 
-async def fetch_article_or_fail(article_id: str, session: AsyncSession) -> Article:
-    statement = select(Article).where(Article.id == article_id).limit(2)
-    article = (await session.scalars(statement)).one()
-    return article
+async def fetch_article_or_fail(article_id: UUID, session: AsyncSession) -> Article:
+    try:
+        statement = select(Article).where(Article.id == article_id).limit(2)
+        article = (await session.scalars(statement)).one()
+        return article
+
+    except (NoResultFound, MultipleResultsFound) as e:
+        raise CustomDatabaseNotFoundException(
+            message=f"Article with {article_id} not found"
+        ) from e
 
 
 async def find_articles(query: ArticlesFindParams, session: SessionDep):

@@ -1,6 +1,8 @@
+import asyncio
 from typing import Annotated
+from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Query
 
 from src.articles.schemas import (
     ArticleCreate,
@@ -19,6 +21,8 @@ from src.articles.service import (
 )
 from src.database.service import SessionDep
 from src.embeddings.service import save_embeddings
+from src.error_handlers.decorators import custom_exception_handler_for_http
+from src.errors.models import CustomHttpException
 
 articles_router = APIRouter(prefix="/articles", tags=["articles"])
 
@@ -32,7 +36,7 @@ async def create_article(
     page_numbers_to_delete = article.page_numbers_to_delete
 
     if not url.startswith("https://arxiv.org/pdf/"):
-        raise HTTPException(
+        raise CustomHttpException(
             status_code=400,
             detail={"message": "Invalid URL. Only arXiv PDF URLs are supported."},
         )
@@ -40,7 +44,7 @@ async def create_article(
     find_articles_query = ArticlesFindParams(url=url, offset=0, limit=1)
     existing_articles = await find_articles(query=find_articles_query, session=session)
     if existing_articles:
-        raise HTTPException(
+        raise CustomHttpException(
             status_code=400,
             detail={"message": "Article already exists."},
         )
@@ -55,7 +59,7 @@ async def create_article(
 
     notes = await generate_notes(documents)
 
-    save_article(
+    save_article_task = save_article(
         create_article_dto=CreateArticleDto(
             name=name,
             url=url,
@@ -64,14 +68,19 @@ async def create_article(
         ),
         session=session,
     )
-    save_embeddings(documents=documents, url=url, session=session)
-    await session.commit()
+    save_embeddings_task = save_embeddings(
+        documents=documents, url=url, session=session
+    )
 
+    await asyncio.gather(save_article_task, save_embeddings_task)
+
+    await session.commit()
     return CreateArticleResponse(notes=notes)
 
 
 @articles_router.get("/{article_id}")
-async def get_article_by_id(article_id: str, session: SessionDep):
+@custom_exception_handler_for_http
+async def get_article_by_id(article_id: UUID, session: SessionDep):
     article = await fetch_article_or_fail(article_id=article_id, session=session)
     return {"article": article}
 

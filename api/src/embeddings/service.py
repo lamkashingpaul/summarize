@@ -6,7 +6,7 @@ from src.embeddings.models import Embedding
 from src.embeddings.schemas import CreateEmbeddingDto
 
 
-def save_embeddings(
+async def save_embeddings(
     documents: list[Document], url: str, session: SessionDep
 ) -> list[Embedding]:
     model = CohereEmbeddings(
@@ -15,20 +15,22 @@ def save_embeddings(
         client=None,
     )
 
-    embedded_documents = model.embed_documents([doc.page_content for doc in documents])
+    embedded_documents = await model.aembed_documents(
+        [doc.page_content for doc in documents]
+    )
 
     embeddings = [
         Embedding(
             **CreateEmbeddingDto(
-                content=documents[i].page_content,
-                embedding=embedded_documents[i],
+                content=document.page_content,
+                embedding=embedded_document,
                 additional_metadata={
-                    **documents[i].metadata,
+                    **document.metadata,
                     "url": url,
                 },
             ).model_dump()
         )
-        for i in range(len(embedded_documents))
+        for document, embedded_document in zip(documents, embedded_documents)
     ]
 
     session.add_all(embeddings)

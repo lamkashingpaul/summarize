@@ -6,10 +6,10 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
-from src.articles.models import Article
+from src.articles.models import Article  # noqa: F401
 from src.database.models import Base
-from src.embeddings.models import Embedding
-from src.question_and_answers.models import QuestionAndAnswer
+from src.embeddings.models import Embedding  # noqa: F401
+from src.question_and_answers.models import QuestionAndAnswer  # noqa: F401
 from src.settings.service import settings
 
 # this is the Alembic Config object, which provides
@@ -25,12 +25,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = [
-    Base.metadata,
-    Article.metadata,
-    Embedding.metadata,
-    QuestionAndAnswer.metadata,
-]
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

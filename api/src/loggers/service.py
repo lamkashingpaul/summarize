@@ -10,7 +10,6 @@ class UTCFormatter(logging.Formatter):
 
 
 def setup_logging():
-    """Set up logging configuration."""
     logging_config = {
         "version": 1,
         "disable_existing_loggers": False,
@@ -38,7 +37,6 @@ def setup_logging():
 
 
 def get_default_logger():
-    """Get the default logger."""
     if settings.env == "development":
         return logging.getLogger("uvicorn")
     return logging.getLogger("application")
