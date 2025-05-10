@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.articles.models import Article, Note
 from src.articles.schemas import ArticlesFindParams, CreateArticleDto
 from src.database.service import SessionDep
+from src.embeddings.utils import format_documents_to_string
 from src.errors.models import CustomDatabaseNotFoundException
 from src.prompts.service import format_note, format_output_notes, notes_prompt
 
@@ -66,10 +67,7 @@ def convert_pdf_to_documents(pdf_data: bytes) -> list[Document]:
 
 
 async def generate_notes(documents: list[Document]) -> list[Note]:
-    documents_as_string = "\n\n".join(
-        f"<<Content of Page {doc.metadata['page'] + 1}>>\n{doc.page_content}"
-        for doc in documents
-    )
+    documents_as_string = format_documents_to_string(documents)
     model = ChatDeepSeek(model="deepseek-chat", temperature=0.0)
 
     model_with_tools = model.bind_tools(tools=[format_note], tool_choice="any")

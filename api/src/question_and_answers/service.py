@@ -6,12 +6,14 @@ from sqlalchemy import select
 from src.articles.models import Note
 from src.database.service import SessionDep
 from src.embeddings.models import Embedding
+from src.embeddings.utils import format_documents_to_string
 from src.errors.models import CustomDatabaseNotFoundException
 from src.prompts.service import (
     answer_question_prompt,
     format_answer_to_question,
     format_output_answer_to_question,
 )
+from src.question_and_answers.schemas import CreateQuestionAndAnswerDto
 
 
 async def answer_question(
@@ -43,16 +45,26 @@ async def answer_question(
     ]
 
     answer, followup_questions = await generate_answer(question, documents, notes)
+
+    create_question_and_answer_dto = CreateQuestionAndAnswerDto(
+        question=question,
+        answer=answer,
+        followup_questions=followup_questions,
+        context=format_documents_to_string(documents),
+    )
+
+    await save_question_and_answer(
+        create_question_and_answer_dto=create_question_and_answer_dto,
+        session=session,
+    )
+
     return answer, followup_questions
 
 
 async def generate_answer(
     question: str, documents: list[Document], notes: list[Note]
 ) -> tuple[str, list[str]]:
-    documents_as_string = "\n\n".join(
-        f"<<Content of Page {doc.metadata['page'] + 1}>>\n{doc.page_content}"
-        for doc in documents
-    )
+    documents_as_string = format_documents_to_string(documents)
     notes_as_string = "\n".join(note.note for note in notes)
 
     model = ChatDeepSeek(model="deepseek-chat", temperature=0.0)
@@ -74,3 +86,9 @@ async def generate_answer(
     answer, followup_questions = response
 
     return answer, followup_questions
+
+
+async def save_question_and_answer(
+    create_question_and_answer_dto: CreateQuestionAndAnswerDto, session: SessionDep
+) -> None:
+    pass

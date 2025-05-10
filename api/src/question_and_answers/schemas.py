@@ -9,3 +9,10 @@ class QuestionAsk(BaseModel):
 class QuestionAskResponse(BaseModel):
     answer: str = Field(...)
     followup_questions: list[str] = Field(...)
+
+
+class CreateQuestionAndAnswerDto(BaseModel):
+    question: str = Field(..., min_length=1, max_length=255)
+    answer: str = Field(...)
+    followup_questions: list[str] = Field(...)
+    context: str = Field(...)
