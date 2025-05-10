@@ -17,9 +17,12 @@
     "pydantic",
     "pymupdf",
     "pytest",
+    "serviceworker",
     "sessionmaker",
     "slowapi",
-    "sqlalchemy"
+    "sqlalchemy",
+    "turbopack",
+    "unrs"
   ],
   "python.analysis.extraPaths": ["./api"]
 }
