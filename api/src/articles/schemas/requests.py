@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from src.articles.models import Note
+from src.articles.models.note import Note
 
 
 class ArticleCreate(BaseModel):
@@ -14,10 +14,6 @@ class CreateArticleDto(BaseModel):
     url: str = Field(..., min_length=1, max_length=255)
     content: str = Field(..., min_length=1)
     notes: list[Note] = Field(...)
-
-
-class CreateArticleResponse(BaseModel):
-    notes: list[Note] = Field(default=[])
 
 
 class ArticlesFindParams(BaseModel):

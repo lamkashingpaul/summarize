@@ -4,11 +4,16 @@ from uuid import UUID
 
 from fastapi import APIRouter, Query
 
-from src.articles.schemas import (
+from src.articles.schemas.requests import (
     ArticleCreate,
     ArticlesFindParams,
     CreateArticleDto,
+)
+from src.articles.schemas.responses import (
+    ArticleResponse,
     CreateArticleResponse,
+    GetArticleByIdResponse,
+    GetArticlesResponse,
 )
 from src.articles.service import (
     convert_pdf_to_documents,
@@ -27,7 +32,8 @@ from src.errors.models import CustomHttpException
 articles_router = APIRouter(prefix="/articles", tags=["articles"])
 
 
-@articles_router.post("")
+@articles_router.post("", status_code=201)
+@custom_exception_handler_for_http
 async def create_article(
     article: ArticleCreate, session: SessionDep
 ) -> CreateArticleResponse:
@@ -38,7 +44,7 @@ async def create_article(
     if not url.startswith("https://arxiv.org/pdf/"):
         raise CustomHttpException(
             status_code=400,
-            detail={"message": "Invalid URL. Only arXiv PDF URLs are supported."},
+            detail="Invalid URL. Only arXiv PDF URLs are supported.",
         )
 
     find_articles_query = ArticlesFindParams(url=url, offset=0, limit=1)
@@ -46,7 +52,7 @@ async def create_article(
     if existing_articles:
         raise CustomHttpException(
             status_code=400,
-            detail={"message": "Article already exists."},
+            detail="Article already exists.",
         )
 
     downloaded_article = await download_article(url)
@@ -75,20 +81,29 @@ async def create_article(
     await asyncio.gather(save_article_task, save_embeddings_task)
 
     await session.commit()
-    return CreateArticleResponse(notes=notes)
+    return CreateArticleResponse(detail="Article created successfully.")
 
 
 @articles_router.get("/{article_id}")
 @custom_exception_handler_for_http
-async def get_article_by_id(article_id: UUID, session: SessionDep):
+async def get_article_by_id(
+    article_id: UUID, session: SessionDep
+) -> GetArticleByIdResponse:
     article = await fetch_article_or_fail(article_id=article_id, session=session)
-    return {"article": article}
+    return GetArticleByIdResponse(
+        article=ArticleResponse.model_construct(**article.__dict__)
+    )
 
 
 @articles_router.get("")
+@custom_exception_handler_for_http
 async def get_articles(
     query: Annotated[ArticlesFindParams, Query()],
     session: SessionDep,
-):
+) -> GetArticlesResponse:
     articles = await find_articles(query=query, session=session)
-    return {"articles": articles}
+    return GetArticlesResponse.model_construct(
+        articles=[
+            ArticleResponse.model_construct(**article.__dict__) for article in articles
+        ]
+    )

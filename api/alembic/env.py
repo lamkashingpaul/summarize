@@ -6,10 +6,12 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
-from src.articles.models import Article  # noqa: F401
+from src.articles.models.article import Article  # noqa: F401
 from src.database.models import Base
 from src.embeddings.models import Embedding  # noqa: F401
-from src.question_and_answers.models import QuestionAndAnswer  # noqa: F401
+from src.question_and_answers.models.question_and_answer import (
+    QuestionAndAnswer,  # noqa: F401
+)
 from src.settings.service import settings
 
 # this is the Alembic Config object, which provides

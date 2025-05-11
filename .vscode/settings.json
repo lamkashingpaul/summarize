@@ -22,7 +22,8 @@
     "slowapi",
     "sqlalchemy",
     "turbopack",
-    "unrs"
+    "unrs",
+    "vercel"
   ],
   "python.analysis.extraPaths": ["./api"]
 }

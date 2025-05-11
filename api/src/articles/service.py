@@ -11,8 +11,9 @@ from sqlalchemy import select
 from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.articles.models import Article, Note
-from src.articles.schemas import ArticlesFindParams, CreateArticleDto
+from src.articles.models.article import Article
+from src.articles.models.note import Note
+from src.articles.schemas.requests import ArticlesFindParams, CreateArticleDto
 from src.database.service import SessionDep
 from src.embeddings.utils import format_documents_to_string
 from src.errors.models import CustomDatabaseNotFoundException

@@ -1,9 +1,10 @@
 from fastapi import APIRouter, HTTPException
 
-from src.articles.schemas import ArticlesFindParams
+from src.articles.schemas.requests import ArticlesFindParams
 from src.articles.service import find_articles
 from src.database.service import SessionDep
-from src.question_and_answers.schemas import QuestionAsk, QuestionAskResponse
+from src.question_and_answers.schemas.requests import QuestionAsk
+from src.question_and_answers.schemas.responses import QuestionAskResponse
 from src.question_and_answers.service import answer_question
 
 question_and_answers_router = APIRouter(

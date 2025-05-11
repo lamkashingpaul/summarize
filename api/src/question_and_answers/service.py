@@ -3,7 +3,7 @@ from langchain_core.documents import Document
 from langchain_deepseek import ChatDeepSeek
 from sqlalchemy import select
 
-from src.articles.models import Note
+from src.articles.models.note import Note
 from src.database.service import SessionDep
 from src.embeddings.models import Embedding
 from src.embeddings.utils import format_documents_to_string
@@ -13,7 +13,7 @@ from src.prompts.service import (
     format_answer_to_question,
     format_output_answer_to_question,
 )
-from src.question_and_answers.schemas import CreateQuestionAndAnswerDto
+from src.question_and_answers.schemas.requests import CreateQuestionAndAnswerDto
 
 
 async def answer_question(
