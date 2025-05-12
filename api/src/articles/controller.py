@@ -1,12 +1,12 @@
 import asyncio
 from typing import Annotated
-from uuid import UUID
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Path, Query
 
 from src.articles.schemas.requests import (
     ArticleCreate,
-    ArticlesFindParams,
+    ArticleGetParams,
+    ArticlesFindQuery,
     CreateArticleDto,
 )
 from src.articles.schemas.responses import (
@@ -36,7 +36,8 @@ articles_router = APIRouter(prefix="/articles", tags=["articles"])
 @articles_router.post("", status_code=201)
 @custom_exception_handler_for_http
 async def create_article(
-    article: ArticleCreate, session: SessionDep
+    article: ArticleCreate,
+    session: SessionDep,
 ) -> CreateArticleResponse:
     name = article.name
     url = article.url
@@ -87,8 +88,10 @@ async def create_article(
 @articles_router.get("/{article_id}")
 @custom_exception_handler_for_http
 async def get_article_by_id(
-    article_id: UUID, session: SessionDep
+    params: Annotated[ArticleGetParams, Path()],
+    session: SessionDep,
 ) -> GetArticleByIdResponse:
+    article_id = params.article_id
     article = await fetch_article_by_id_or_fail(article_id=article_id, session=session)
     return GetArticleByIdResponse(
         article=ArticleResponse.model_construct(**article.__dict__)
@@ -98,7 +101,7 @@ async def get_article_by_id(
 @articles_router.get("")
 @custom_exception_handler_for_http
 async def get_articles(
-    query: Annotated[ArticlesFindParams, Query()],
+    query: Annotated[ArticlesFindQuery, Query()],
     session: SessionDep,
 ) -> GetArticlesResponse:
     articles = await find_articles(query=query, session=session)

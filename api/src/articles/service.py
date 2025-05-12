@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.articles.models.article import Article
 from src.articles.models.note import Note
-from src.articles.schemas.requests import ArticlesFindParams, CreateArticleDto
+from src.articles.schemas.requests import ArticlesFindQuery, CreateArticleDto
 from src.database.service import SessionDep
 from src.embeddings.utils import format_documents_to_string
 from src.errors.models import CustomDatabaseNotFoundException
@@ -112,7 +112,7 @@ async def fetch_article_by_url_or_fail(url: str, session: AsyncSession) -> Artic
         ) from e
 
 
-async def find_articles(query: ArticlesFindParams, session: SessionDep):
+async def find_articles(query: ArticlesFindQuery, session: SessionDep):
     name = query.name
     url = query.url
     offset = query.offset

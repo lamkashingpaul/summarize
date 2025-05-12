@@ -1,3 +1,4 @@
+from datetime import datetime
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
@@ -9,6 +10,7 @@ class ArticleResponse(BaseModel):
     id: UUID
     name: str
     url: str
+    created_at: datetime
 
 
 class CreateArticleResponse(BaseModel):
@@ -33,6 +35,7 @@ class GetArticleByIdResponse(BaseModel):
                     "id": "123e4567-e89b-12d3-a456-426614174000",
                     "name": "Sample Article",
                     "url": "https://arxiv.org/pdf/sample.pdf",
+                    "created_at": "2023-10-01T12:00:00Z",
                 }
             }
         }
@@ -50,6 +53,7 @@ class GetArticlesResponse(BaseModel):
                         "id": "123e4567-e89b-12d3-a456-426614174000",
                         "name": "Sample Article",
                         "url": "https://arxiv.org/pdf/sample.pdf",
+                        "created_at": "2023-10-01T12:00:00Z",
                     }
                 ]
             }

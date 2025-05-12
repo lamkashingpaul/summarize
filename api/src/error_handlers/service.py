@@ -18,13 +18,13 @@ def handle_custom_database_exception_for_http(e: Exception, passthrough: bool = 
         case CustomDatabaseNotFoundException():
             raise CustomHttpException(
                 status_code=404,
-                detail={"message": e.message},
+                detail=e.message,
             ) from e
 
         case _:
             raise CustomHttpException(
                 status_code=500,
-                detail={"message": "Internal Server Error"},
+                detail="Internal Server Error",
             ) from e
 
 
@@ -38,5 +38,5 @@ async def custom_http_exception_handler(request: Request, exc: CustomHttpExcepti
 async def global_exception_handler(request: Request, exc: Exception):
     return JSONResponse(
         status_code=500,
-        content={"detail": {"message": "Internal Server Error"}},
+        content={"detail": "Internal Server Error"},
     )
