@@ -9,6 +9,7 @@
     "fastapi",
     "getbuffer",
     "gmtime",
+    "ilike",
     "langchain",
     "levelname",
     "pgadmin",

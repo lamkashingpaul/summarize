@@ -86,7 +86,9 @@ async def save_article(create_article_dto: CreateArticleDto, session: SessionDep
     return article
 
 
-async def fetch_article_or_fail(article_id: UUID, session: AsyncSession) -> Article:
+async def fetch_article_by_id_or_fail(
+    article_id: UUID, session: AsyncSession
+) -> Article:
     try:
         statement = select(Article).where(Article.id == article_id).limit(2)
         article = (await session.scalars(statement)).one()
@@ -94,18 +96,35 @@ async def fetch_article_or_fail(article_id: UUID, session: AsyncSession) -> Arti
 
     except (NoResultFound, MultipleResultsFound) as e:
         raise CustomDatabaseNotFoundException(
-            message=f"Article with {article_id} not found"
+            message=f"Article with id: {article_id} not found"
+        ) from e
+
+
+async def fetch_article_by_url_or_fail(url: str, session: AsyncSession) -> Article:
+    try:
+        statement = select(Article).where(Article.url == url).limit(2)
+        article = (await session.scalars(statement)).one()
+        return article
+
+    except (NoResultFound, MultipleResultsFound) as e:
+        raise CustomDatabaseNotFoundException(
+            message=f"Article with url: {url} not found"
         ) from e
 
 
 async def find_articles(query: ArticlesFindParams, session: SessionDep):
+    name = query.name
     url = query.url
     offset = query.offset
     limit = query.limit
 
-    statement = select(Article).offset(offset).limit(limit)
+    statement = (
+        select(Article).offset(offset).limit(limit).order_by(Article.created_at.desc())
+    )
+    if name:
+        statement = statement.filter(Article.name.ilike(f"%{name}%"))
     if url:
-        statement = statement.where(Article.url == url)
+        statement = statement.filter(Article.url.ilike(f"%{url}%"))
 
     articles = (await session.scalars(statement)).all()
     return articles

@@ -19,7 +19,8 @@ from src.articles.service import (
     convert_pdf_to_documents,
     delete_page_numbers_from_pdf,
     download_article,
-    fetch_article_or_fail,
+    fetch_article_by_id_or_fail,
+    fetch_article_by_url_or_fail,
     find_articles,
     generate_notes,
     save_article,
@@ -47,8 +48,7 @@ async def create_article(
             detail="Invalid URL. Only arXiv PDF URLs are supported.",
         )
 
-    find_articles_query = ArticlesFindParams(url=url, offset=0, limit=1)
-    existing_articles = await find_articles(query=find_articles_query, session=session)
+    existing_articles = await fetch_article_by_url_or_fail(url=url, session=session)
     if existing_articles:
         raise CustomHttpException(
             status_code=400,
@@ -89,7 +89,7 @@ async def create_article(
 async def get_article_by_id(
     article_id: UUID, session: SessionDep
 ) -> GetArticleByIdResponse:
-    article = await fetch_article_or_fail(article_id=article_id, session=session)
+    article = await fetch_article_by_id_or_fail(article_id=article_id, session=session)
     return GetArticleByIdResponse(
         article=ArticleResponse.model_construct(**article.__dict__)
     )

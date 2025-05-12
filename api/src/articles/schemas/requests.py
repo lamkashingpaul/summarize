@@ -17,6 +17,7 @@ class CreateArticleDto(BaseModel):
 
 
 class ArticlesFindParams(BaseModel):
+    name: str = Field("", max_length=255)
     url: str = Field("", max_length=255)
     offset: int = Field(0, ge=0)
     limit: int = Field(10, gt=0, le=50)

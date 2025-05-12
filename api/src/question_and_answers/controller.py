@@ -1,7 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
-from src.articles.schemas.requests import ArticlesFindParams
-from src.articles.service import find_articles
+from src.articles.service import fetch_article_by_url_or_fail
 from src.database.service import SessionDep
 from src.question_and_answers.schemas.requests import QuestionAsk
 from src.question_and_answers.schemas.responses import QuestionAskResponse
@@ -16,14 +15,14 @@ question_and_answers_router = APIRouter(
 async def ask_question(
     question_ask: QuestionAsk, session: SessionDep
 ) -> QuestionAskResponse:
-    find_articles_query = ArticlesFindParams(url=question_ask.url, offset=0, limit=1)
-    existing_articles = await find_articles(query=find_articles_query, session=session)
-    if not existing_articles:
+    url = question_ask.url
+    existing_article = await fetch_article_by_url_or_fail(url=url, session=session)
+    if not existing_article:
         raise HTTPException(
             status_code=400,
             detail={"message": "Article does not exist."},
         )
-    notes = existing_articles[0].notes
+    notes = existing_article.notes
 
     answer, followup_questions = await answer_question(
         url=question_ask.url,
