@@ -5,7 +5,7 @@ from sqlalchemy import select
 
 from src.articles.models.note import Note
 from src.database.service import SessionDep
-from src.embeddings.models import Embedding
+from src.embeddings.models.embedding import Embedding
 from src.embeddings.utils import format_documents_to_string
 from src.errors.models import CustomDatabaseNotFoundException
 from src.prompts.service import (

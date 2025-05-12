@@ -2,8 +2,8 @@ from langchain_cohere import CohereEmbeddings
 from langchain_core.documents import Document
 
 from src.database.service import SessionDep
-from src.embeddings.models import Embedding
-from src.embeddings.schemas import CreateEmbeddingDto
+from src.embeddings.models.embedding import Embedding
+from src.embeddings.schemas.requests import CreateEmbeddingDto
 
 
 async def save_embeddings(
