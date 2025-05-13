@@ -4,6 +4,7 @@
     "ainvoke",
     "aiohttp",
     "asyncpg",
+    "axois",
     "deepseek",
     "dotenv",
     "fastapi",

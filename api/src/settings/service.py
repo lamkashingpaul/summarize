@@ -29,6 +29,8 @@ class Settings(BaseSettings):
     unstructured_api_key: str = Field(description="Unstructured API key")
     unstructured_api_url: str = Field(description="Unstructured API URL")
 
+    allow_origins: list[str] = Field(description="Allowed origins for CORS")
+
 
 settings = Settings.model_validate({})
 
