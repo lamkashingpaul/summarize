@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 from src.articles.models.article import Article  # noqa: F401
 from src.database.models import Base
-from src.embeddings.models import Embedding  # noqa: F401
+from src.embeddings.models.embedding import Embedding  # noqa: F401
 from src.question_and_answers.models.question_and_answer import (
     QuestionAndAnswer,  # noqa: F401
 )

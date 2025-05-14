@@ -26,9 +26,6 @@ class Settings(BaseSettings):
     langsmith_api_key: str = Field(description="Langsmith API key")
     langsmith_project: str = Field(description="Langsmith project name")
 
-    unstructured_api_key: str = Field(description="Unstructured API key")
-    unstructured_api_url: str = Field(description="Unstructured API URL")
-
     allow_origins: list[str] = Field(description="Allowed origins for CORS")
 
 
@@ -41,5 +38,3 @@ os.environ["LANGSMITH_API_KEY"] = settings.langsmith_api_key
 os.environ["LANGSMITH_ENDPOINT"] = settings.langsmith_endpoint
 os.environ["LANGSMITH_PROJECT"] = settings.langsmith_project
 os.environ["LANGSMITH_TRACING"] = settings.langsmith_tracing
-os.environ["UNSTRUCTURED_API_KEY"] = settings.unstructured_api_key
-os.environ["UNSTRUCTURED_API_URL"] = settings.unstructured_api_url

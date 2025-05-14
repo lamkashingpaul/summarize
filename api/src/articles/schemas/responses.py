@@ -43,11 +43,17 @@ class GetArticleByIdResponse(BaseModel):
 
 
 class GetArticlesResponse(BaseModel):
+    articles_total_count: int
+    articles_total_pages: int
+    articles_has_next_page: bool
     articles: list[ArticleResponse]
 
     model_config = {
         "json_schema_extra": {
             "example": {
+                "articles_total_count": 100,
+                "articles_total_pages": 10,
+                "articles_has_next_page": True,
                 "articles": [
                     {
                         "id": "123e4567-e89b-12d3-a456-426614174000",
@@ -55,7 +61,7 @@ class GetArticlesResponse(BaseModel):
                         "url": "https://arxiv.org/pdf/sample.pdf",
                         "created_at": "2023-10-01T12:00:00Z",
                     }
-                ]
+                ],
             }
         }
     }

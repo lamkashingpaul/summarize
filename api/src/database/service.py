@@ -10,7 +10,12 @@ engine = create_async_engine(
     echo=settings.env == "development",
 )
 
-AsyncSessionLocal = async_sessionmaker(bind=engine, expire_on_commit=False)
+AsyncSessionLocal = async_sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    expire_on_commit=False,
+    bind=engine,
+)
 
 
 async def get_session():

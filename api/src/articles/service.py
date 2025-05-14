@@ -7,12 +7,13 @@ from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_core.documents import Document
 from langchain_deepseek import ChatDeepSeek
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.articles.models.article import Article
 from src.articles.models.note import Note
+from src.articles.schemas.internals import FindArticlesReturn
 from src.articles.schemas.requests import ArticlesFindQuery, CreateArticleDto
 from src.database.service import SessionDep
 from src.embeddings.utils import format_documents_to_string
@@ -58,7 +59,13 @@ def convert_pdf_to_documents(pdf_data: bytes) -> list[Document]:
             line for line in map(str.strip, document.page_content.split("\n")) if line
         ).replace("  ", " ")
 
-        document.page_content = cleaned_content.replace(". ", ".\n\n")
+        document.page_content = cleaned_content.replace(
+            ". ",
+            ".\n\n",
+        ).replace(
+            "\u0000",
+            "",
+        )
         chunks = text_splitter.split_documents([document])
         for chunk in chunks:
             chunk.metadata["page"] = document.metadata["page"]
@@ -100,31 +107,45 @@ async def fetch_article_by_id_or_fail(
         ) from e
 
 
-async def fetch_article_by_url_or_fail(url: str, session: AsyncSession) -> Article:
-    try:
-        statement = select(Article).where(Article.url == url).limit(2)
-        article = (await session.scalars(statement)).one()
-        return article
-
-    except (NoResultFound, MultipleResultsFound) as e:
-        raise CustomDatabaseNotFoundException(
-            message=f"Article with url: {url} not found"
-        ) from e
+async def fetch_article_by_url(url: str, session: AsyncSession):
+    statement = select(Article).where(Article.url == url).limit(2)
+    article = (await session.scalars(statement)).one_or_none()
+    return article
 
 
-async def find_articles(query: ArticlesFindQuery, session: SessionDep):
+async def find_articles(
+    query: ArticlesFindQuery, session: SessionDep
+) -> FindArticlesReturn:
     name = query.name
     url = query.url
+    page_index = query.page_index
     offset = query.offset
     limit = query.limit
 
-    statement = (
-        select(Article).offset(offset).limit(limit).order_by(Article.created_at.desc())
-    )
+    filters = []
     if name:
-        statement = statement.filter(Article.name.ilike(f"%{name}%"))
+        filters.append(Article.name.ilike(f"%{name}%"))
     if url:
-        statement = statement.filter(Article.url.ilike(f"%{url}%"))
+        filters.append(Article.url.ilike(f"%{url}%"))
 
-    articles = (await session.scalars(statement)).all()
-    return articles
+    data_statement = (
+        select(Article)
+        .where(*filters)
+        .order_by(Article.created_at.desc())
+        .offset(offset)
+        .limit(limit)
+    )
+    count_statement = select(func.count()).select_from(Article).where(*filters)
+
+    articles = (await session.scalars(data_statement)).all()
+    total_count = await session.scalar(count_statement) or 0
+    corrected_limit = limit or total_count or 1
+    total_pages = (total_count + corrected_limit - 1) // corrected_limit
+    has_next_page = page_index + 1 < total_pages
+
+    return FindArticlesReturn(
+        articles_total_count=total_count,
+        articles_total_pages=total_pages,
+        articles_has_next_page=has_next_page,
+        articles=articles,
+    )

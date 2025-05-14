@@ -20,7 +20,7 @@ from src.articles.service import (
     delete_page_numbers_from_pdf,
     download_article,
     fetch_article_by_id_or_fail,
-    fetch_article_by_url_or_fail,
+    fetch_article_by_url,
     find_articles,
     generate_notes,
     save_article,
@@ -49,8 +49,8 @@ async def create_article(
             detail="Invalid URL. Only arXiv PDF URLs are supported.",
         )
 
-    existing_articles = await fetch_article_by_url_or_fail(url=url, session=session)
-    if existing_articles:
+    existing_articles = await fetch_article_by_url(url=url, session=session)
+    if existing_articles is not None:
         raise CustomHttpException(
             status_code=400,
             detail="Article already exists.",
@@ -104,9 +104,16 @@ async def get_articles(
     query: Annotated[ArticlesFindQuery, Query()],
     session: SessionDep,
 ) -> GetArticlesResponse:
-    articles = await find_articles(query=query, session=session)
+    res = await find_articles(query=query, session=session)
+
     return GetArticlesResponse.model_construct(
-        articles=[
-            ArticleResponse.model_construct(**article.__dict__) for article in articles
-        ]
+        articles_total_count=res.articles_total_count,
+        articles_total_pages=res.articles_total_pages,
+        articles_has_next_page=res.articles_has_next_page,
+        articles=list(
+            map(
+                lambda article: ArticleResponse.model_construct(**article.__dict__),
+                res.articles,
+            )
+        ),
     )

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
-from src.articles.service import fetch_article_by_url_or_fail
+from src.articles.service import fetch_article_by_url
 from src.database.service import SessionDep
 from src.question_and_answers.schemas.requests import QuestionAsk
 from src.question_and_answers.schemas.responses import QuestionAskResponse
@@ -16,8 +16,8 @@ async def ask_question(
     question_ask: QuestionAsk, session: SessionDep
 ) -> QuestionAskResponse:
     url = question_ask.url
-    existing_article = await fetch_article_by_url_or_fail(url=url, session=session)
-    if not existing_article:
+    existing_article = await fetch_article_by_url(url=url, session=session)
+    if existing_article is None:
         raise HTTPException(
             status_code=400,
             detail={"message": "Article does not exist."},
