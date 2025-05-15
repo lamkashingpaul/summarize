@@ -1,5 +1,5 @@
 # postgres
-FROM postgres:17.4 AS postgres
+FROM postgres:17.5 AS postgres
 RUN apt-get update && apt-get install -y \
     postgresql-server-dev-17 \
     gcc \

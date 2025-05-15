@@ -8,6 +8,7 @@ import pluginReactHooks from "eslint-plugin-react-hooks";
 import onlyWarn from "eslint-plugin-only-warn";
 import globals from "globals";
 import tseslint from "typescript-eslint";
+import pluginQuery from "@tanstack/eslint-plugin-query";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -23,6 +24,7 @@ const eslintConfig = [
   js.configs.recommended,
   eslintConfigPrettier,
   ...tseslint.configs.recommended,
+  ...pluginQuery.configs["flat/recommended"],
   {
     ...pluginReact.configs.flat.recommended,
     languageOptions: {
@@ -47,7 +49,7 @@ const eslintConfig = [
       "@typescript-eslint/no-empty-object-type": "off",
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-vars": [
-        "warn",
+        "error",
         {
           argsIgnorePattern: "^_",
           caughtErrors: "none",
