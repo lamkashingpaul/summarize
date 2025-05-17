@@ -1,9 +1,11 @@
 "use client";
+import { SlideIn } from "@/components/slide-in";
 import { Card, CardContent } from "@/components/ui/card";
 import { InputWithLoading } from "@/components/ui/input-with-loading";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSearchArticles } from "@/features/articles/api";
 import { useDebounce } from "@/hooks/use-debounce";
+import { AnimatePresence } from "motion/react";
 import { useCallback, useMemo, useState } from "react";
 
 export const SearchArticles = () => {
@@ -83,7 +85,13 @@ export const SearchArticles = () => {
         onChange={onChange}
       />
 
-      <SearchResultCard />
+      <AnimatePresence>
+        {debouncedSearch && (
+          <SlideIn>
+            <SearchResultCard />
+          </SlideIn>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
