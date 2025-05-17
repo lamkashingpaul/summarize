@@ -6,18 +6,17 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSearchArticles } from "@/features/articles/api";
 import { useDebounce } from "@/hooks/use-debounce";
 import { AnimatePresence } from "motion/react";
-import { useCallback, useMemo, useState } from "react";
+import React, { useState } from "react";
+import { useInView } from "react-intersection-observer";
 
 export const SearchArticles = () => {
   const [search, setSearch] = useState<string>("");
   const debouncedSearch = useDebounce(search, 300);
+  const { ref, inView } = useInView();
 
-  const { data, isLoading, isError } = useSearchArticles(
-    {
-      name: debouncedSearch,
-      page_index: 0,
-      page_size: 9,
-    },
+  const { data, status, isFetching, hasNextPage } = useSearchArticles(
+    { name: debouncedSearch, page_size: 10 },
+    inView,
     { enabled: !!debouncedSearch },
   );
 
@@ -25,62 +24,12 @@ export const SearchArticles = () => {
     setSearch(e.target.value);
   };
 
-  const renderSearchResultCard = useCallback(() => {
-    if (!debouncedSearch || isLoading) {
-      return <></>;
-    }
-
-    if (isError || !data) {
-      return (
-        <Card>
-          <CardContent>
-            <p className="text-center text-sm text-red-500">
-              An error occurred while fetching articles. Please try again.
-            </p>
-          </CardContent>
-        </Card>
-      );
-    }
-
-    if (!data.articles.length) {
-      return (
-        <Card>
-          <CardContent>
-            <p className="text-muted-foreground text-center text-sm">
-              No articles found for &quot;{search}&quot;
-            </p>
-          </CardContent>
-        </Card>
-      );
-    }
-
-    return (
-      <ScrollArea className="bg-card text-card-foreground flex max-h-64 flex-col gap-6 overflow-hidden rounded-xl border px-6 py-6 shadow-sm">
-        <p className="text-muted-foreground text-center text-sm">
-          Search Results
-        </p>
-        {data.articles.map((article) => (
-          <div
-            key={article.id}
-            className="hover:bg-muted-foreground/10 cursor-pointer rounded-md p-2"
-          >
-            {article.name}
-          </div>
-        ))}
-      </ScrollArea>
-    );
-  }, [debouncedSearch, isLoading, isError, data, search]);
-  const SearchResultCard = useMemo(
-    () => renderSearchResultCard,
-    [renderSearchResultCard],
-  );
-
   return (
     <div className="w-full max-w-3xl space-y-2 sm:space-y-4">
       <InputWithLoading
         className="h-14 rounded-lg border pr-12 pl-4 text-base shadow-sm"
         placeholder="Search existing articles"
-        isLoading={!data && isLoading}
+        isLoading={isFetching}
         value={search}
         onChange={onChange}
       />
@@ -88,7 +37,52 @@ export const SearchArticles = () => {
       <AnimatePresence>
         {debouncedSearch && (
           <SlideIn>
-            <SearchResultCard />
+            {!debouncedSearch || status === "pending" ? (
+              <></>
+            ) : status === "error" ? (
+              <Card>
+                <CardContent>
+                  <p className="text-center text-sm text-red-500">
+                    An error occurred while fetching articles. Please try again.
+                  </p>
+                </CardContent>
+              </Card>
+            ) : !data.pages.length ||
+              data.pages[0].articles_total_count === 0 ? (
+              <Card>
+                <CardContent>
+                  <p className="text-muted-foreground text-center text-sm">
+                    No articles found for &quot;{search}&quot;
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <ScrollArea className="bg-card text-card-foreground flex max-h-64 flex-col gap-6 overflow-hidden rounded-xl border px-6 py-6 shadow-sm">
+                <p className="text-muted-foreground text-center text-sm">
+                  Search Results
+                </p>
+                {data.pages.map((page, i) => (
+                  <React.Fragment key={i}>
+                    {i === data.pages.length - 1 ? (
+                      <div ref={ref} className="h-2"></div>
+                    ) : null}
+                    {page.articles.map((article) => (
+                      <div
+                        key={article.id}
+                        className="hover:bg-muted-foreground/10 cursor-pointer rounded-md p-2"
+                      >
+                        {article.name}
+                      </div>
+                    ))}
+                  </React.Fragment>
+                ))}
+                {hasNextPage ? (
+                  <div className="text-muted-foreground text-center text-sm">
+                    Loading more results...
+                  </div>
+                ) : null}
+              </ScrollArea>
+            )}
           </SlideIn>
         )}
       </AnimatePresence>
