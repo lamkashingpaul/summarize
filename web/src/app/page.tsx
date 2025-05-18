@@ -1,18 +1,15 @@
-import { SearchArticles } from "@/features/articles/components";
+import { ChangelogSection } from "@/components/changelog-section";
+import { IntroductionSection } from "@/components/introduction-section";
+import { RoadmapSection } from "@/components/roadmap-section";
+import { SearchArticlesSection } from "@/components/search-articles-section";
 
 export default function Home() {
   return (
-    <section className="my-auto">
-      <div className="container-wrapper">
-        <div className="container">
-          <div className="flex flex-col items-center justify-center gap-4">
-            <h1 className="text-4xl font-bold">
-              What can I help you summarize?
-            </h1>
-            <SearchArticles />
-          </div>
-        </div>
-      </div>
-    </section>
+    <div className="relative">
+      <SearchArticlesSection />
+      <IntroductionSection />
+      <RoadmapSection />
+      <ChangelogSection />
+    </div>
   );
 }

@@ -1,5 +1,5 @@
 import {
-  authorsLinkedIn,
+  authorLinkedIn,
   projectAuthor,
   projectGithub,
 } from "@/lib/site-config";
@@ -18,7 +18,7 @@ export const SiteFooter = () => {
             <div className="text-muted-foreground text-center text-sm leading-loose text-balance md:text-left">
               {`© ${currentYear} `}
               <a
-                href={authorsLinkedIn}
+                href={authorLinkedIn}
                 target="_blank"
                 rel="noreferrer"
                 className="hover:text-primary font-medium underline underline-offset-4 transition-colors"
