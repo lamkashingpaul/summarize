@@ -6,7 +6,7 @@ export const SearchArticlesSection = () => {
       <div className="container-wrapper">
         <div className="container">
           <div className="flex flex-col items-center justify-center gap-4">
-            <h1 className="text-4xl font-bold">
+            <h1 className="text-center text-4xl font-bold">
               What can I help you summarize?
             </h1>
             <SearchArticles />
