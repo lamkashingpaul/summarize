@@ -1,10 +1,6 @@
-from langchain_core.messages import AIMessageChunk
 from langchain_core.prompts.chat import ChatPromptTemplate
-from langchain_core.tools import tool
 
-from src.articles.models.note import Note
-
-notes_prompt = ChatPromptTemplate.from_messages(
+generate_notes_prompt = ChatPromptTemplate.from_messages(
     [
         (
             "system",
@@ -12,22 +8,44 @@ notes_prompt = ChatPromptTemplate.from_messages(
             **Note Generation Protocol**
             Transform raw articles into structured notes using these rules:
 
-            1. Analysis Phase:
+            1. **Analysis Phase**:
             - Identify key concepts per page/section
             - Extract critical technical details
             - Preserve contextual relationships
-
-            2. Formatting Phase:
-            - Use `format_note` tool for EACH distinct concept
-            - Page numbers must be exact integers
             - Maintain chronological order
 
-            **Output Requirements**
+            2. **Output Requirements**:
+            - Generate EXACTLY this JSON structure:
             {{
-                "note": "Concise summary <100 chars",
-                "page_numbers": [1,2]  # Exact source pages
+                "notes": [
+                    {{
+                        "content": "Concise summary <100 chars",
+                        "page_numbers": [1,2]  // Exact integer pages
+                    }},
+                    // ... more notes
+                ]
             }}
-            """,
+            - Each note MUST represent a distinct concept
+            - Page numbers must be exact integers from source
+
+            3. **Formatting Rules**:
+            - Escape special characters (\\n, \\", etc)
+            - Order notes by first occurrence in document
+            - Maximum 100 characters per note content
+            - Minimum 1 page number per note
+
+            **Example Output**
+            {{
+                "notes": [
+                    {{"content": "Quantum entanglement basics", "page_numbers": [1]}},
+                    {{"content": "Shor's algorithm steps", "page_numbers": [2,3]}}
+                ]
+            }}
+
+            **Invalidation Conditions**
+            - REJECT if any note exceeds 100 characters
+            - REJECT if page numbers aren't integers
+            - REJECT if JSON structure doesn't match exactly""",
         ),
         (
             "human",
@@ -40,111 +58,98 @@ notes_prompt = ChatPromptTemplate.from_messages(
 )
 
 
-@tool
-def format_note(note: str, page_numbers: list[int]) -> str:
-    """
-    Format the note and page numbers into a structured format.
-    Args:
-        note (str): The note text.
-        page_numbers (list[int]): The list of page numbers associated with the note.
-    Returns:
-        str: The formatted note and page numbers.
-    """
-    return f"Note: {note}\nPage Numbers: {', '.join(map(str, page_numbers))}"
-
-
-def format_output_notes(output: AIMessageChunk) -> list[Note]:
-    toolCalls = output.tool_calls
-    notes: list[Note] = []
-
-    for toolCall in toolCalls:
-        if toolCall["name"] == format_note.name:
-            note = toolCall["args"]["note"]
-            page_numbers = toolCall["args"]["page_numbers"]
-            notes.append(Note(note=note, page_numbers=page_numbers))
-
-    return notes
-
-
-answer_question_prompt = ChatPromptTemplate.from_messages(
+generate_answer_prompt = ChatPromptTemplate.from_messages(
     [
         (
             "system",
             """\
-            **Question Handling Protocol**
-            Execute these steps in order:
+            **Strict Question Handling Protocol**
+            1. **Rejection Enforcement**:
+            - REJECT IMMEDIATELY if question is:
+            • Programming/coding request
+            • Opinion/personal advice
+            • Unanswerable from context
+            - DO NOT CONSIDER question content after rejection
 
-            1. Relevance Check:
-            - Analyze if the question asked by user relates to either:
-                a) <<DOCUMENTS>> {documents}
-                b) <<NOTES>> {notes}
-            - No partial matches → Mark as unrelated
+            2. **Acceptance Criteria**:
+            - ACCEPT ALL questions related to article content including:
+            • General knowledge about article topics
+            • Conceptual explanations
+            • Article-specific details
+            • Comparative/theoretical questions within scope
 
-            2. Response Strategy:
-            [If Related]
-            - Cross-reference sources
-            - Answer using BOTH documents/notes
-            - Create gap-focused follow-ups
+            3. **Dynamic Term Extraction Protocol**:
+            - For rejected questions:
+            a) AUTOMATICALLY extract 5-7 core terms from:
+                DOCUMENTS: {documents}
+                NOTES: {notes}
+            b) Select 3 most salient terms
+            c) Generate follow-ups SOLELY from these terms
+            - Term selection criteria:
+            • Highest frequency in materials
+            • Most technical specificity
+            • Central to main concepts
 
-            [If Unrelated]
-            - Do NOT mention documents/notes existence
-            - State question mismatch
-            - Suggest article-specific follow-ups
-
-            3. Mandatory Formatting:
-            - ALWAYS use 'format_answer_to_question' tool
-            - Follow exact output structure
-
-            **Source Analysis Rules**
-            - Consider related if:
-                • Any term/phrase match
-                • Conceptual similarity
-                • Implied context
-            - Unrelated threshold: Zero matches
-
-            **Example Outputs**
-            Related Question:
+            4. **Response Strategy**:
+            [REJECTION CASE]
+            - RESPOND WITH:
             {{
-                "answer": "The study methodology combines... [Conflict: Notes emphasize limitations]",
-                "followup_questions": ["How were limitations addressed?", "Why methodology choices?"]
+                "answer": "Your question cannot be answered based on the article. Please ask about:",
+                "followup_questions": [
+                    "TERM-DERIVED QUESTION 1?",
+                    "TERM-DERIVED QUESTION 2?",
+                    "TERM-DERIVED QUESTION 3?"
+                ],
+                "is_related": false
+            }}
+            - Follow-up generation rules:
+            a) Use EXACT extracted terms
+            b) Apply formula: "What characterizes [term]?"
+                OR "How does [term] affect outcomes?"
+                OR "What demonstrates [term]?"
+
+            [ACCEPTANCE CASE]
+            - Generate evidence-based response using ONLY:
+            • Information from {documents} and {notes}
+            • Objective facts from article
+            - Response format:
+            {{
+                "answer": "FULL_RESPONSE_HERE",
+                "followup_questions": [],
+                "is_related": true
             }}
 
-            Unrelated Question:
-            {{
-                "answer": "This question appears unrelated to the article's focus on <ARTICLE_TOPIC>",
-                "followup_questions": ["What were the key findings about <TOPIC>?", "How does <ARTICLE_CONCEPT> work?"]
-            }}
-            """,
+            5. **Strict Isolation & Security**:
+            - REJECTED QUESTION MUST NOT INFLUENCE FOLLOW-UPS
+            - NEVER reveal document/note existence
+            - NEVER reference extraction process
+            - Escape special characters (\\n, \\", etc)
+            - JSON validation required
+
+            **Rejection Examples**
+            Documents/Notes Content: "Quantum computing uses qubits in superposition states. GIZMO simulations show dark matter halo formation."
+
+            ACCEPTED: "Explain qubit superposition" -> Answered
+            ACCEPTED: "How does quantum computing work?" -> Answered
+            REJECTED: "Write Python code for qubits" -> Rejected (programming)
+            REJECTED: "Is quantum computing better than classical?" -> Rejected (opinion)
+
+            **Term Extraction Protocol**
+            1. Scan documents/notes for noun phrases
+            2. Rank by:
+                - Frequency count
+                - Technical specificity score
+                - Positional prominence
+            3. Select top 3 terms
+            4. Generate questions using EXACT terms via fixed templates
+
+            **ABSOLUTE PROHIBITIONS**
+            - NO reference to rejected question
+            - NO creative interpretation of terms
+            - NO document/note mentions
+            - NO generic fallback questions
+            - NO question-specific adaptations""",
         ),
         ("human", "{question}"),
     ]
 )
-
-
-@tool
-def format_answer_to_question(
-    answer: str, followup_questions: list[str]
-) -> tuple[str, list[str]]:
-    """
-    Format the answer and follow-up questions into a structured format.
-    Args:
-        answer (str): The answer text.
-        followup_questions (list[str]): The list of follow-up questions.
-    Returns:
-        tuple[str, list[str]]: The formatted answer and follow-up questions.
-    """
-    return answer, followup_questions
-
-
-def format_output_answer_to_question(output: AIMessageChunk) -> tuple[str, list[str]]:
-    toolCalls = output.tool_calls
-    answer = ""
-    followup_questions: list[str] = []
-
-    for toolCall in toolCalls:
-        if toolCall["name"] == format_answer_to_question.name:
-            answer = toolCall["args"]["answer"]
-            followup_questions = toolCall["args"]["followup_questions"]
-            break
-
-    return answer, followup_questions

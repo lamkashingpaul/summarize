@@ -9,10 +9,9 @@ from alembic import context
 from src.articles.models.article import Article  # noqa: F401
 from src.database.models import Base
 from src.embeddings.models.embedding import Embedding  # noqa: F401
-from src.question_and_answers.models.question_and_answer import (
-    QuestionAndAnswer,  # noqa: F401
-)
+from src.notes.models.note import Note  # noqa: F401
 from src.settings.service import settings
+from src.utils.custom_jsonb import CustomJsonbType
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -33,6 +32,15 @@ target_metadata = Base.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
+
+
+def render_item(type_, obj, autogen_context):
+    """Apply custom rendering for selected items."""
+    if type_ == "type" and isinstance(obj, CustomJsonbType):
+        return "postgresql.JSONB(astext_type=sa.Text())"
+
+    # default rendering for other objects
+    return False
 
 
 def run_migrations_offline() -> None:
@@ -60,7 +68,11 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection: Connection) -> None:
-    context.configure(connection=connection, target_metadata=target_metadata)
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+        render_item=render_item,
+    )
 
     with context.begin_transaction():
         context.run_migrations()

@@ -1,79 +1,81 @@
+from typing import cast
+
 from langchain_cohere import CohereEmbeddings
 from langchain_core.documents import Document
 from langchain_deepseek import ChatDeepSeek
-from sqlalchemy import select
 
-from src.articles.models.note import Note
+from src.articles.models.article import Article
 from src.database.service import SessionDep
-from src.embeddings.models.embedding import Embedding
+from src.embeddings.service import get_k_closest_embeddings
 from src.embeddings.utils import format_documents_to_string
 from src.errors.models import CustomDatabaseNotFoundException
-from src.prompts.service import (
-    answer_question_prompt,
-    format_answer_to_question,
-    format_output_answer_to_question,
+from src.notes.models.note import Note
+from src.prompts.service import generate_answer_prompt
+from src.question_and_answers.schemas.internals import (
+    GenerateAnswerChain,
+    GenerateAnswerChainOutput,
+    GenerateAnswerReturn,
 )
-from src.question_and_answers.schemas.requests import CreateQuestionAndAnswerDto
 
 
-async def answer_question(
-    url: str, question: str, notes: list[Note], session: SessionDep
-) -> tuple[str, list[str]]:
-    model = CohereEmbeddings(
+async def get_article_documents_and_notes(
+    article: Article, question: str, session: SessionDep
+) -> tuple[list[Document], set[Note]]:
+    notes = article.notes
+
+    target_embedding = await CohereEmbeddings(
         model="embed-english-v3.0",
         async_client=None,
         client=None,
         request_timeout=10.0,
-    )
-    target_embedding = await model.aembed_query(question)
+    ).aembed_query(question)
 
-    statement = (
-        select(Embedding)
-        .where(Embedding.additional_metadata.comparator.contains({"url": url}))
-        .order_by(Embedding.embedding.l2_distance(target_embedding))
-        .limit(5)
+    embeddings = await get_k_closest_embeddings(
+        target_embedding=target_embedding,
+        article=article,
+        k=5,
+        session=session,
     )
-    embeddings = (await session.scalars(statement)).all()
     if not embeddings:
         raise CustomDatabaseNotFoundException(
-            message="No embeddings found for the given URL."
+            message="No embeddings found for the article.",
         )
 
     documents = [
-        Document(page_content=embedding.content, metadata=embedding.additional_metadata)
+        Document(
+            page_content=embedding.content,
+            metadata=embedding.additional_metadata,
+        )
         for embedding in embeddings
     ]
 
-    answer, followup_questions = await generate_answer(question, documents, notes)
+    return documents, notes
 
-    create_question_and_answer_dto = CreateQuestionAndAnswerDto(
+
+async def answer_question(article: Article, question: str, session: SessionDep):
+    documents, notes = await get_article_documents_and_notes(
+        article=article,
         question=question,
-        answer=answer,
-        followup_questions=followup_questions,
-        context=format_documents_to_string(documents),
-    )
-
-    await save_question_and_answer(
-        create_question_and_answer_dto=create_question_and_answer_dto,
         session=session,
     )
 
-    return answer, followup_questions
+    response = await generate_answer(question, documents, notes)
+    return response
 
 
 async def generate_answer(
-    question: str, documents: list[Document], notes: list[Note]
-) -> tuple[str, list[str]]:
+    question: str, documents: list[Document], notes: set[Note]
+) -> GenerateAnswerReturn:
     documents_as_string = format_documents_to_string(documents)
-    notes_as_string = "\n".join(note.note for note in notes)
+    notes_as_string = "\n".join(note.content for note in notes)
 
     model = ChatDeepSeek(model="deepseek-chat", temperature=0.0)
 
-    model_with_tools = model.bind_tools(
-        tools=[format_answer_to_question], tool_choice="any"
+    chain = cast(
+        GenerateAnswerChain,
+        generate_answer_prompt
+        | model.with_structured_output(GenerateAnswerChainOutput),
     )
-
-    chain = answer_question_prompt | model_with_tools | format_output_answer_to_question
 
     response = await chain.ainvoke(
         {
@@ -83,12 +85,8 @@ async def generate_answer(
         }
     )
 
-    answer, followup_questions = response
-
-    return answer, followup_questions
-
-
-async def save_question_and_answer(
-    create_question_and_answer_dto: CreateQuestionAndAnswerDto, session: SessionDep
-) -> None:
-    pass
+    return GenerateAnswerReturn(
+        answer=response.answer,
+        followup_questions=response.followup_questions,
+        is_related=response.is_related,
+    )

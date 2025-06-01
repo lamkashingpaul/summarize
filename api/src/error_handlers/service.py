@@ -1,5 +1,6 @@
-from fastapi import Request
+from fastapi import Request, Response
 from fastapi.responses import JSONResponse
+from slowapi.errors import RateLimitExceeded
 
 from src.errors.models import (
     CustomDatabaseException,
@@ -33,6 +34,17 @@ async def custom_http_exception_handler(request: Request, exc: CustomHttpExcepti
         status_code=exc.status_code,
         content={"detail": exc.detail},
     )
+
+
+def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded) -> Response:
+    response = JSONResponse(
+        status_code=429,
+        content={"detail": "Rate limit exceeded"},
+    )
+    response = request.app.state.limiter._inject_headers(
+        response, request.state.view_rate_limit
+    )
+    return response
 
 
 async def global_exception_handler(request: Request, exc: Exception):

@@ -1,7 +1,7 @@
 import os
 from typing import Literal
 
-from pydantic import Field, PostgresDsn
+from pydantic import Field, PostgresDsn, RedisDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 env = os.getenv("ENV", "development")
@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     deepseek_api_key: str = Field(description="DeepSeek API key")
 
     database_url: PostgresDsn = Field(description="PostgreSQL database URL")
+
+    redis_url: RedisDsn = Field(description="Redis database URL")
 
     langsmith_tracing: Literal["true"] = Field(description="Enable Langsmith tracing")
     langsmith_endpoint: str = Field(description="Langsmith endpoint")

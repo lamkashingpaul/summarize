@@ -1,12 +1,16 @@
 import uuid
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, func, text
-from sqlalchemy.dialects.postgresql import ARRAY, TEXT, UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.dialects.postgresql import TEXT, UUID
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.articles.models.note import Note, NoteType
 from src.database.models import Base
+
+if TYPE_CHECKING:
+    from src.embeddings.models.embedding import Embedding
+    from src.notes.models.note import Note
 
 
 class Article(Base):
@@ -22,7 +26,7 @@ class Article(Base):
         nullable=False,
         server_default=func.now(),
     )
-    name: Mapped[str] = mapped_column(
+    title: Mapped[str] = mapped_column(
         TEXT,
         nullable=False,
     )
@@ -34,7 +38,12 @@ class Article(Base):
         TEXT,
         nullable=False,
     )
-    notes: Mapped[list[Note]] = mapped_column(
-        ARRAY(NoteType),
-        nullable=False,
+
+    notes: Mapped[set["Note"]] = relationship(
+        back_populates="article",
+        lazy="selectin",
+    )
+    embeddings: Mapped[set["Embedding"]] = relationship(
+        back_populates="article",
+        lazy="selectin",
     )

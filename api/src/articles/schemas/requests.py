@@ -3,15 +3,13 @@ from uuid import UUID
 from fastapi import Path
 from pydantic import BaseModel, Field, computed_field
 
-from src.articles.models.note import Note
-
 
 class ArticleCreate(BaseModel):
-    name: str = Field(
+    title: str = Field(
         ...,
         min_length=1,
         max_length=255,
-        description="The name of the article.",
+        description="The title of the article.",
     )
     url: str = Field(
         ...,
@@ -27,19 +25,12 @@ class ArticleCreate(BaseModel):
     model_config = {
         "json_schema_extra": {
             "example": {
-                "name": "Sample Article",
+                "title": "Sample Article",
                 "url": "https://arxiv.org/pdf/sample.pdf",
                 "page_numbers_to_delete": [1, 2],
             }
         }
     }
-
-
-class CreateArticleDto(BaseModel):
-    name: str = Field(..., min_length=1, max_length=255)
-    url: str = Field(..., min_length=1, max_length=255)
-    content: str = Field(..., min_length=1)
-    notes: list[Note] = Field(...)
 
 
 class ArticleGetParams(BaseModel):
@@ -50,11 +41,19 @@ class ArticleGetParams(BaseModel):
     )
 
 
+class ArticleUpdateParams(BaseModel):
+    article_id: UUID = Path(
+        ...,
+        description="The ID of the article to update.",
+        example="123e4567-e89b-12d3-a456-426614174000",
+    )
+
+
 class ArticlesFindQuery(BaseModel):
-    name: str = Field(
+    title: str = Field(
         "",
         max_length=255,
-        description="The name of the article to search for.",
+        description="The title of the article to search for.",
     )
     url: str = Field(
         "",

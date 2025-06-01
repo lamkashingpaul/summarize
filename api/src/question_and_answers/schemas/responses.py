@@ -1,8 +1,20 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel
 
 
-class QuestionAskResponse(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+class AskQuestionResponse(BaseModel):
+    answer: str
+    followup_questions: list[str]
+    is_related: bool
 
-    answer: str = Field(...)
-    followup_questions: list[str] = Field(...)
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "answer": "The answer to the question.",
+                "followup_questions": [
+                    "What is the main topic?",
+                    "Can you explain further?",
+                ],
+                "is_related": True,
+            }
+        }
+    }

@@ -2,9 +2,8 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from pgvector.sqlalchemy import Vector
 from sqlalchemy import DateTime, ForeignKey, func, text
-from sqlalchemy.dialects.postgresql import JSONB, TEXT, UUID
+from sqlalchemy.dialects.postgresql import ARRAY, INTEGER, TEXT, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database.models import Base
@@ -13,8 +12,8 @@ if TYPE_CHECKING:
     from src.articles.models.article import Article
 
 
-class Embedding(Base):
-    __tablename__ = "embeddings"
+class Note(Base):
+    __tablename__ = "notes"
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
@@ -30,12 +29,8 @@ class Embedding(Base):
         TEXT,
         nullable=False,
     )
-    embedding: Mapped[list[float]] = mapped_column(
-        Vector,
-        nullable=False,
-    )
-    additional_metadata: Mapped[dict] = mapped_column(
-        JSONB,
+    page_numbers: Mapped[set[int]] = mapped_column(
+        ARRAY(INTEGER),
         nullable=False,
     )
     article_id: Mapped[uuid.UUID] = mapped_column(
@@ -43,5 +38,5 @@ class Embedding(Base):
     )
 
     article: Mapped["Article"] = relationship(
-        back_populates="embeddings",
+        back_populates="notes",
     )

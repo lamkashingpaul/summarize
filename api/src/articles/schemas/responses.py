@@ -8,7 +8,7 @@ class ArticleResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID
-    name: str
+    title: str
     url: str
     created_at: datetime
 
@@ -33,7 +33,7 @@ class GetArticleByIdResponse(BaseModel):
             "example": {
                 "article": {
                     "id": "123e4567-e89b-12d3-a456-426614174000",
-                    "name": "Sample Article",
+                    "title": "Sample Article",
                     "url": "https://arxiv.org/pdf/sample.pdf",
                     "created_at": "2023-10-01T12:00:00Z",
                 }
@@ -42,7 +42,24 @@ class GetArticleByIdResponse(BaseModel):
     }
 
 
-class GetArticlesResponse(BaseModel):
+class UpdateArticleByIdResponse(BaseModel):
+    article: ArticleResponse
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "article": {
+                    "id": "123e4567-e89b-12d3-a456-426614174000",
+                    "title": "Updated Sample Article",
+                    "url": "https://arxiv.org/pdf/sample_updated.pdf",
+                    "created_at": "2023-10-01T12:00:00Z",
+                }
+            }
+        }
+    }
+
+
+class SearchArticlesResponse(BaseModel):
     articles_total_count: int
     articles_total_pages: int
     articles_has_next_page: bool
@@ -57,7 +74,7 @@ class GetArticlesResponse(BaseModel):
                 "articles": [
                     {
                         "id": "123e4567-e89b-12d3-a456-426614174000",
-                        "name": "Sample Article",
+                        "title": "Sample Article",
                         "url": "https://arxiv.org/pdf/sample.pdf",
                         "created_at": "2023-10-01T12:00:00Z",
                     }

@@ -7,13 +7,17 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: arxiv_papers
+      POSTGRES_DB: articles_rag_chatbot
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+  redis:
+    image: redis:8.0.2
+    ports:
+      - "6379:6379"
   pgadmin4:
-    image: dpage/pgadmin4:9.3.0
+    image: dpage/pgadmin4:9.4.0
     environment:
       PGADMIN_DEFAULT_EMAIL: postgres@postgres.com
       PGADMIN_DEFAULT_PASSWORD: postgres@postgres.com
