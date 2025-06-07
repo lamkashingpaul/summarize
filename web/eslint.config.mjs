@@ -1,53 +1,33 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
+import "eslint-plugin-only-warn";
 import js from "@eslint/js";
-import eslintConfigPrettier from "eslint-config-prettier";
-import pluginReact from "eslint-plugin-react";
-import pluginReactHooks from "eslint-plugin-react-hooks";
-import onlyWarn from "eslint-plugin-only-warn";
 import globals from "globals";
 import tseslint from "typescript-eslint";
+import pluginReact from "eslint-plugin-react";
+import { defineConfig, globalIgnores } from "eslint/config";
+import { FlatCompat } from "@eslint/eslintrc";
 import pluginQuery from "@tanstack/eslint-plugin-query";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const compat = new FlatCompat({ baseDirectory: import.meta.dirname });
 
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
-
-const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
-  { ignores: ["*.js", ".*.js", "node_modules/", ".next/"] },
-  { plugins: { onlyWarn } },
-  js.configs.recommended,
-  eslintConfigPrettier,
-  ...tseslint.configs.recommended,
-  ...pluginQuery.configs["flat/recommended"],
+export default defineConfig([
+  globalIgnores([".next", "node_modules"]),
   {
-    ...pluginReact.configs.flat.recommended,
-    languageOptions: {
-      ...pluginReact.configs.flat.recommended.languageOptions,
-      globals: {
-        ...globals.serviceworker,
-      },
-    },
+    files: ["**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+    plugins: { js },
+    extends: ["js/recommended"],
   },
   {
-    plugins: {
-      "react-hooks": pluginReactHooks,
-    },
-    settings: { react: { version: "detect" } },
+    files: ["**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+    languageOptions: { globals: { ...globals.browser, ...globals.node } },
+  },
+  tseslint.configs.recommended,
+  pluginReact.configs.flat.recommended,
+
+  ...pluginQuery.configs["flat/recommended"],
+  ...compat.config({
+    extends: ["next", "next/core-web-vitals", "next/typescript", "prettier"],
     rules: {
-      ...pluginReactHooks.configs.recommended.rules,
-      // React scope no longer necessary with new JSX transform.
-      "no-console": ["error", { allow: ["warn", "error"] }],
-      "no-unused-vars": "off",
-      "react/prop-types": "off",
-      "react/react-in-jsx-scope": "off",
-      "@typescript-eslint/no-empty-object-type": "off",
-      "@typescript-eslint/no-explicit-any": "off",
+      "no-console": "error",
       "@typescript-eslint/no-unused-vars": [
         "error",
         {
@@ -57,7 +37,5 @@ const eslintConfig = [
         },
       ],
     },
-  },
-];
-
-export default eslintConfig;
+  }),
+]);

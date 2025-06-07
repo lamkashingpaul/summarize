@@ -2,9 +2,8 @@
 
 import { InputWithLoading } from "@/components/ui/input-with-loading";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useSearchArticles } from "@/features/articles/api";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { useQueryState } from "nuqs";
 import {
@@ -12,29 +11,44 @@ import {
   PopoverAnchor,
   PopoverContent,
 } from "@/components/ui/popover";
+import { useSearchArticles } from "@/features/articles/api/use-search-articles";
 import { useDebounceCallback } from "@/hooks/use-debounce-callback";
 
 export const SearchArticles = () => {
+  return (
+    <Suspense>
+      <UnsuspendedSearchArticles />
+    </Suspense>
+  );
+};
+
+const UnsuspendedSearchArticles = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useQueryState("search", { defaultValue: "" });
-  const debouncedSetSearch = useDebounceCallback(setSearch, 500);
+  const [input, setInput] = useState(search);
+  const debouncedSetSearch = useDebounceCallback(setSearch, 300);
   const { ref, inView } = useInView();
 
   const { data, status, isFetching, hasNextPage } = useSearchArticles(
-    { name: search, page_size: 10 },
+    { title: search, page_size: 10 },
     inView,
-    { enabled: !!search },
   );
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+    debouncedSetSearch(e.target.value);
+  };
 
   return (
     <div className="w-full max-w-3xl space-y-2 sm:space-y-4">
-      <Popover open={!!search && isOpen}>
+      <Popover open={isOpen}>
         <PopoverAnchor>
           <InputWithLoading
             inputClassName="h-14 rounded-lg border pr-12 pl-4 text-base shadow-sm"
             placeholder="Search existing articles from the database..."
             isLoading={isFetching}
-            onChange={(e) => debouncedSetSearch(e.target.value)}
+            value={input}
+            onChange={onChange}
             onFocus={() => setIsOpen(true)}
             onBlur={() => setIsOpen(false)}
           />
@@ -43,7 +57,7 @@ export const SearchArticles = () => {
           className="w-[var(--radix-popover-trigger-width)]"
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
-          {!search || status === "pending" ? (
+          {status === "pending" ? (
             <></>
           ) : status === "error" ? (
             <p className="text-center text-sm text-red-500">
@@ -56,7 +70,7 @@ export const SearchArticles = () => {
           ) : (
             <ScrollArea className="flex max-h-64 flex-col">
               <p className="text-muted-foreground text-center text-sm">
-                Search Results
+                {search ? "Search Results" : "Featured Articles"}
               </p>
               {data.pages.map((page, i) => (
                 <React.Fragment key={i}>
@@ -66,7 +80,7 @@ export const SearchArticles = () => {
                   {page.articles.map((article) => (
                     <Link key={article.id} href={`/articles/${article.id}`}>
                       <div className="hover:bg-muted-foreground/10 cursor-pointer rounded-md p-2">
-                        {article.name}
+                        {article.title}
                       </div>
                     </Link>
                   ))}

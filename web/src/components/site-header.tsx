@@ -10,7 +10,7 @@ export const SiteHeader = () => {
             <span className="text-lg font-semibold">Summarize</span>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <ModeToggle />
             <ComingSoonButton variant="ghost">Sign In</ComingSoonButton>
             <ComingSoonButton>Sign Up</ComingSoonButton>

@@ -1,4 +1,4 @@
-import { searchArticlesQuerySchema } from "@/features/articles/schemas";
+import { searchArticlesSchema } from "@/features/articles/schemas";
 import { SearchArticlesResponse } from "@/features/articles/types";
 import { customFetch } from "@/lib/axois";
 import { ReactQueryError } from "@/lib/react-query";
@@ -9,16 +9,15 @@ import {
   UseInfiniteQueryOptions,
 } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { z } from "zod";
+import { z } from "zod/v4";
 
-type SearchArticlesQueryDto = z.input<typeof searchArticlesQuerySchema>;
+type SearchArticlesQueryDto = z.input<typeof searchArticlesSchema.shape.query>;
 type SearchArticlesResponseData = SearchArticlesResponse;
 type UseSearchArticlesOptions = Omit<
   UseInfiniteQueryOptions<
     SearchArticlesResponseData,
     ReactQueryError,
     InfiniteData<SearchArticlesResponseData, number>,
-    SearchArticlesResponseData,
     QueryKey,
     number
   >,
@@ -31,7 +30,7 @@ type UseSearchArticlesOptions = Omit<
 
 const searchArticles = async (query: SearchArticlesQueryDto) => {
   const response = await customFetch<SearchArticlesResponseData>({
-    url: "/articles",
+    url: "/articles/search",
     params: query,
   });
   return response.data;
@@ -49,9 +48,9 @@ export const useSearchArticles = (
     QueryKey,
     number
   >({
-    queryKey: ["articles", query],
     queryFn: ({ pageParam }) =>
       searchArticles({ ...query, page_index: pageParam }),
+    queryKey: ["articles", "search", query],
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages, lastPageParam) => {
       if (!lastPage.articles_has_next_page) {

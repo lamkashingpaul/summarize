@@ -1,6 +1,6 @@
 export type ArticleResponse = {
   id: string;
-  name: string;
+  title: string;
   url: string;
   created_at: string;
 };

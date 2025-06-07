@@ -16,7 +16,7 @@ question_and_answers_router = APIRouter(
 
 
 @question_and_answers_router.post("/articles/{article_id}/questions")
-@limiter.limit("5/minute")
+@limiter.limit("10/minute")
 @custom_exception_handler_for_http
 async def ask_question(
     request: Request,

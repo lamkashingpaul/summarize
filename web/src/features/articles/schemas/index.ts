@@ -1,3 +1,2 @@
-export * from "./create-article-body.schema";
-export * from "./search-article-query.schema";
-export * from "./get-article-by-id-params.schema";
+export * from "./search-articles.schema";
+export * from "./get-article-by-id.schema";

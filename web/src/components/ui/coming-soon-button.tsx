@@ -61,8 +61,8 @@ function ComingSoonButton({
     <Comp
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
-      onClick={onClick}
       {...props}
+      onClick={onClick}
     />
   );
 }

@@ -1,11 +1,18 @@
-import { getArticleByIdParamsSchema } from "@/features/articles/schemas";
+import { getArticleByIdSchema } from "@/features/articles/schemas";
 import { GetArticleByIdResponse } from "@/features/articles/types";
 import { customFetch } from "@/lib/axois";
 import { ReactQueryError } from "@/lib/react-query";
-import { useQuery, UseQueryOptions } from "@tanstack/react-query";
-import { z } from "zod";
+import {
+  queryOptions,
+  useQuery,
+  UseQueryOptions,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
+import { z } from "zod/v4";
 
-type GetArticleByIdParamsDto = z.infer<typeof getArticleByIdParamsSchema>;
+type GetArticleByIdParamsDto = z.infer<
+  typeof getArticleByIdSchema.shape.params
+>;
 type GetArticleByIdResponseData = GetArticleByIdResponse;
 type UseGetArticleByIdOptions = Omit<
   UseQueryOptions<GetArticleByIdResponseData, ReactQueryError>,
@@ -21,16 +28,29 @@ const getArticleById = async (
   return response.data;
 };
 
-export const useGetArticleById = (
-  query: GetArticleByIdParamsDto,
+export const createGetArticleByIdQueryOptions = (
+  params: GetArticleByIdParamsDto,
   options?: UseGetArticleByIdOptions,
 ) => {
-  const { articleId } = query;
-  const q = useQuery<GetArticleByIdResponseData, ReactQueryError>({
-    queryKey: ["articles", articleId],
+  const { articleId } = params;
+
+  return queryOptions<GetArticleByIdResponseData, ReactQueryError>({
     queryFn: () => getArticleById(articleId),
+    queryKey: ["articles", articleId],
     ...options,
   });
+};
 
-  return q;
+export const useGetArticleById = (
+  params: GetArticleByIdParamsDto,
+  options?: UseGetArticleByIdOptions,
+) => {
+  return useQuery(createGetArticleByIdQueryOptions(params, options));
+};
+
+export const useGetArticleByIdSuspense = (
+  params: GetArticleByIdParamsDto,
+  options?: UseGetArticleByIdOptions,
+) => {
+  return useSuspenseQuery(createGetArticleByIdQueryOptions(params, options));
 };

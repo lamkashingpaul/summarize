@@ -1,4 +1,4 @@
-import { SearchArticles } from "@/features/articles/components";
+import { SearchArticles } from "@/features/articles/components/search-articles";
 
 export const SearchArticlesSection = () => {
   return (
