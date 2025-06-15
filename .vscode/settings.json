@@ -3,6 +3,7 @@
     "aembed",
     "ainvoke",
     "aiohttp",
+    "ASGI",
     "astext",
     "astream",
     "asyncpg",
@@ -35,6 +36,7 @@
     "slowapi",
     "sonner",
     "sqlalchemy",
+    "tobytes",
     "turbopack",
     "unrs",
     "vercel"

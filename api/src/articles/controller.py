@@ -31,9 +31,14 @@ from src.embeddings.service import save_embeddings
 from src.error_handlers.decorators import custom_exception_handler_for_http
 from src.errors.models import CustomHttpException
 from src.notes.service import save_notes
+from src.utils.custom_api_route import CustomAPIRoute
 from src.utils.temporary_disable import temporary_disable
 
-articles_router = APIRouter(prefix="/articles", tags=["articles"])
+articles_router = APIRouter(
+    prefix="/articles",
+    tags=["articles"],
+    route_class=CustomAPIRoute,
+)
 
 
 @articles_router.post("", status_code=201)

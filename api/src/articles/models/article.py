@@ -39,11 +39,11 @@ class Article(Base):
         nullable=False,
     )
 
-    notes: Mapped[set["Note"]] = relationship(
+    notes: Mapped[list["Note"]] = relationship(
         back_populates="article",
-        lazy="selectin",
+        lazy="select",
     )
-    embeddings: Mapped[set["Embedding"]] = relationship(
+    embeddings: Mapped[list["Embedding"]] = relationship(
         back_populates="article",
-        lazy="selectin",
+        lazy="select",
     )

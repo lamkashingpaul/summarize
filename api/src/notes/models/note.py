@@ -29,7 +29,7 @@ class Note(Base):
         TEXT,
         nullable=False,
     )
-    page_numbers: Mapped[set[int]] = mapped_column(
+    page_numbers: Mapped[list[int]] = mapped_column(
         ARRAY(INTEGER),
         nullable=False,
     )

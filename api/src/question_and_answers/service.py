@@ -20,8 +20,8 @@ from src.question_and_answers.schemas.internals import (
 
 async def get_article_documents_and_notes(
     article: Article, question: str, session: SessionDep
-) -> tuple[list[Document], set[Note]]:
-    notes = article.notes
+) -> tuple[list[Document], list[Note]]:
+    notes: list[Note] = await article.awaitable_attrs.notes
 
     target_embedding = await CohereEmbeddings(
         model="embed-english-v3.0",
@@ -64,7 +64,7 @@ async def answer_question(article: Article, question: str, session: SessionDep):
 
 
 async def generate_answer(
-    question: str, documents: list[Document], notes: set[Note]
+    question: str, documents: list[Document], notes: list[Note]
 ) -> GenerateAnswerReturn:
     documents_as_string = format_documents_to_string(documents)
     notes_as_string = "\n".join(note.content for note in notes)
