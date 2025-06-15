@@ -201,15 +201,16 @@ export const ArticleChatbotCard = (props: ArticleChatbotCardProps) => {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
+      if (messages.length >= 2) {
+        scrollToView("instant");
+      }
     }
-
-    scrollToView("instant");
 
     return () => {
       document.removeEventListener("keydown", handleEscape);
       document.body.style.overflow = "unset";
     };
-  }, [isFullscreen]);
+  }, [isFullscreen, messages.length]);
 
   const chatContent = (
     <>
@@ -287,6 +288,7 @@ export const ArticleChatbotCard = (props: ArticleChatbotCardProps) => {
               isFullscreen ? "min-h-[80px]" : "min-h-[60px]",
             )}
             placeholder="Ask a question about this article..."
+            name="question"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}

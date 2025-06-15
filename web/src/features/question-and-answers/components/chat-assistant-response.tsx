@@ -48,9 +48,9 @@ export const ChatAssistantResponse = (props: ChatAssistantResponseProps) => {
 
       {!error && followupQuestions && (
         <div className="ml-11 flex flex-wrap gap-2">
-          {followupQuestions.map((question, index) => (
+          {followupQuestions.map((question, i) => (
             <Button
-              key={index}
+              key={i}
               variant="outline"
               size="sm"
               className="text-muted-foreground hover:text-foreground text-xs"

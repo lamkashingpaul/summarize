@@ -30,7 +30,7 @@ export const formatErrorMessage = (error: unknown) => {
     message = error.message;
   }
   if (axios.isAxiosError(error)) {
-    message = error.response?.data?.message || message;
+    message = error.response?.data?.detail || message;
     message = extractFirstZodErrorMessage(error) || message;
   }
   return message;

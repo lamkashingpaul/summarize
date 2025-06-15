@@ -10,8 +10,8 @@ export default function Home() {
       <div className="relative">
         <SearchArticlesSection />
         <IntroductionSection />
-        <RoadmapSection />
         <ChangelogSection />
+        <RoadmapSection />
       </div>
     </SiteLayout>
   );

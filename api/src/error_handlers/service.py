@@ -8,6 +8,9 @@ from src.errors.models import (
     CustomDatabaseNotFoundException,
     CustomHttpException,
 )
+from src.loggers.service import get_default_logger
+
+logger = get_default_logger()
 
 
 def handle_custom_database_exception_for_http(e: Exception, passthrough: bool = False):
@@ -55,6 +58,7 @@ async def custom_http_exception_handler(request: Request, exc: CustomHttpExcepti
 
 
 async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(exc)
     return JSONResponse(
         status_code=500,
         content={"detail": "Internal Server Error"},

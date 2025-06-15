@@ -39,6 +39,7 @@
     "tobytes",
     "turbopack",
     "unrs",
+    "venv",
     "vercel"
   ],
   "python.analysis.extraPaths": ["./api"]
