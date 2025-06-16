@@ -46,7 +46,7 @@
     "@next/eslint-plugin-next": "^15.3.3",
     "@tailwindcss/postcss": "^4.1.10",
     "@tanstack/eslint-plugin-query": "^5.78.0",
-    "@types/node": "^24.0.1",
+    "@types/node": "^24.0.3",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "eslint": "^9.29.0",
@@ -66,12 +66,11 @@
   "engine": {
     "node": ">=22"
   },
-  "packageManager": "pnpm@10.11.1",
+  "packageManager": "pnpm@10.12.1",
   "pnpm": {
     "onlyBuiltDependencies": [
       "@tailwindcss/oxide",
-      "sharp",
-      "unrs-resolver"
+      "sharp"
     ]
   }
 }

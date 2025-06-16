@@ -1,0 +1,119 @@
+# github actions
+.github
+
+# editor settings
+.vscode
+
+# version controls
+.git
+
+# docker files
+.dockerignore
+docker-compose.yml
+Dockerfile
+
+# read me files
+**/*.md
+
+# Virtual environments
+api/.venv/
+
+# PyInstaller
+api/*.manifest
+api/*.spec
+
+# Installer logs
+api/pip-log.txt
+api/pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+api/htmlcov/
+api/.tox/
+api/.nox/
+api/.coverage
+api/coverage.*
+api/.cache
+api/nosetests.xml
+api/coverage.xml
+api/*.cover
+api/*.py,cover
+api/.hypothesis/
+api/.pytest_cache/
+
+# Translations
+api/*.mo
+api/*.pot
+
+# Django stuff:
+api/*.log
+api/local_settings.py
+api/db.sqlite3
+
+# Flask stuff:
+api/instance/
+api/.webassets-cache
+
+# Scrapy stuff:
+api/.scrapy
+
+# Sphinx documentation:
+api/docs/_build/
+
+# PyBuilder
+api/target/
+
+# IPython Notebook
+api/.ipynb_checkpoints
+
+# Pyenv
+api/.python-version
+
+# Celery beat schedule file
+api/celerybeat-schedule
+
+# SageMath parsed files
+api/*.sage.py
+
+# mypy
+api/.mypy_cache/
+api/.dmypy.json
+
+# Pyre type checker
+api/.pyre/
+
+# dependencies
+web/node_modules
+web/.pnp
+web/.pnp.*
+web/.yarn/*
+!web/.yarn/patches
+!web/.yarn/plugins
+!web/.yarn/releases
+!web/.yarn/versions
+
+# testing
+web/coverage
+
+# next.js
+web/.next/
+web/out/
+
+# production
+web/build
+
+# misc
+web/.DS_Store
+web/*.pem
+
+# debug
+web/npm-debug.log*
+web/yarn-debug.log*
+web/yarn-error.log*
+web/.pnpm-debug.log*
+
+# vercel
+web/.vercel
+
+# typescript
+web/*.tsbuildinfo
+web/next-env.d.ts
