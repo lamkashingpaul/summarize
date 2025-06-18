@@ -30,8 +30,8 @@ CMD ["/app/.venv/bin/fastapi", "run", "src/main.py", "--port", "80"]
 FROM node:24.2.0-slim AS web-base
 ENV NODE_ENV=production
 ENV CI=1
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
+ENV PNPM_HOME=/pnpm
+ENV PATH=$PNPM_HOME:$PATH
 RUN corepack enable
 USER node
 WORKDIR /app
@@ -48,7 +48,6 @@ RUN pnpm run build
 
 FROM web-base AS web
 EXPOSE 3000
-COPY --from=web-deps --chown=node:node /app/node_modules /app/node_modules
 COPY --from=web-build --chown=node:node /app/.next/standalone /app/
 COPY --from=web-build --chown=node:node /app/.next/static /app/.next/static
 COPY --from=web-build --chown=node:node /app/public /app/public
