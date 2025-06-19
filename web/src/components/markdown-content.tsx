@@ -1,8 +1,11 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { cn } from "@/lib/utils";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 
 interface MarkdownContentProps {
   content: string;
@@ -16,7 +19,8 @@ export default function MarkdownContent({
   return (
     <div className={cn("prose prose-sm max-w-none", className)}>
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
+        remarkPlugins={[remarkGfm, remarkMath]}
+        rehypePlugins={[rehypeKatex]}
         components={{
           h1: ({ children }) => (
             <h1 className="mt-4 mb-2 text-lg font-semibold first:mt-0">

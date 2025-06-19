@@ -112,6 +112,10 @@ generate_answer_prompt = ChatPromptTemplate.from_messages(
             - Generate evidence-based response using ONLY:
             • Information from {documents} and {notes}
             • Objective facts from article
+            - **LaTeX Formatting**:
+            a) Use LaTeX notation for all mathematical expressions, symbols, and equations
+            b) Enclose LaTeX content in standard notation: $$ for display
+            c) Escape all backslashes by doubling them (e.g., \\alpha → \\\\alpha)
             - Response format:
             {{
                 "answer": "FULL_RESPONSE_HERE",

@@ -1,3 +1,4 @@
+import MarkdownContent from "@/components/markdown-content";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { UserMessage } from "@/features/question-and-answers/types";
@@ -41,7 +42,7 @@ export const ChatUserInput = (props: ChatUserInputProps) => {
         </Avatar>
         <div className="flex max-w-[80%] flex-col gap-2">
           <div className="bg-primary text-primary-foreground rounded-lg px-4 py-2">
-            <p className="whitespace-pre-wrap">{content}</p>
+            <MarkdownContent content={content} />
           </div>
 
           {error && retryable ? (

@@ -57,7 +57,7 @@ export const ChatAssistantResponse = (props: ChatAssistantResponseProps) => {
               onClick={() => handleFollowupClick(question)}
               disabled={status === "pending"}
             >
-              {question}
+              <MarkdownContent content={question} />
             </Button>
           ))}
         </div>
