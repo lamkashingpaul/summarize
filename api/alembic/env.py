@@ -8,6 +8,10 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 from src.analytics.models.request_log import RequestLog  # noqa: F401
 from src.articles.models.article import Article  # noqa: F401
+from src.auth.models.account import Account  # noqa: F401
+from src.auth.models.session import Session  # noqa: F401
+from src.auth.models.user import User  # noqa: F401
+from src.auth.models.verification import Verification  # noqa: F401
 from src.database.models import Base
 from src.embeddings.models.embedding import Embedding  # noqa: F401
 from src.notes.models.note import Note  # noqa: F401

@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import DateTime, func, text
-from sqlalchemy.dialects.postgresql import INTEGER, JSONB, REAL, TEXT, UUID, VARCHAR
+from sqlalchemy.dialects.postgresql import INTEGER, JSONB, REAL, TEXT, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.database.models import Base
@@ -23,16 +23,16 @@ class RequestLog(Base):
         index=True,
     )
     client_ip: Mapped[str] = mapped_column(
-        VARCHAR(45),
+        TEXT,
         nullable=False,
         index=True,
     )
     method: Mapped[str] = mapped_column(
-        VARCHAR(10),
+        TEXT,
         nullable=False,
     )
     path: Mapped[str] = mapped_column(
-        VARCHAR(255),
+        TEXT,
         nullable=False,
         index=True,
     )

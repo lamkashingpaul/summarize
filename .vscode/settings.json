@@ -25,6 +25,7 @@
     "levelname",
     "mathjax",
     "nuqs",
+    "onupdate",
     "pgadmin",
     "pgvector",
     "poolclass",
