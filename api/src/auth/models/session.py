@@ -53,5 +53,4 @@ class Session(Base):
 
     user: Mapped["User"] = relationship(
         back_populates="sessions",
-        lazy="select",
     )

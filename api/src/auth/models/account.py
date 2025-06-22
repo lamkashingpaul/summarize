@@ -68,5 +68,4 @@ class Account(Base):
 
     user: Mapped["User"] = relationship(
         back_populates="accounts",
-        lazy="select",
     )

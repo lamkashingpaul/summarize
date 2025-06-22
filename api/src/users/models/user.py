@@ -1,16 +1,13 @@
 import uuid
 from datetime import datetime
-from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, func, text
 from sqlalchemy.dialects.postgresql import BOOLEAN, TEXT, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from src.auth.models.account import Account
+from src.auth.models.session import Session
 from src.database.models import Base
-
-if TYPE_CHECKING:
-    from src.auth.models.account import Account
-    from src.auth.models.session import Session
 
 
 class User(Base):

@@ -33,6 +33,7 @@ def handle_custom_database_exception_for_http(e: Exception, passthrough: bool = 
             ) from e
 
         case _:
+            logger.error(e)
             raise CustomHttpException(
                 status_code=500,
                 detail="Internal Server Error",

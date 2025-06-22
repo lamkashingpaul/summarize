@@ -18,7 +18,10 @@ from starlette.types import ASGIApp
 from src.analytics.schemas.internals import CreateRequestLogDto
 from src.analytics.tasks import save_request_log_task
 from src.errors.models import CustomHttpException
+from src.loggers.service import get_default_logger
 from src.utils.metadata import LOG_METADATA_KEY, LoggingMetadata
+
+logger = get_default_logger()
 
 
 class RequestAndResponseLogger(BaseHTTPMiddleware):
@@ -50,6 +53,7 @@ class RequestAndResponseLogger(BaseHTTPMiddleware):
             return response
 
         except Exception as e:
+            logger.error(e)
             response = JSONResponse(
                 status_code=500,
                 content={"detail": "Internal Server Error"},

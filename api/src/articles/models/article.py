@@ -1,16 +1,13 @@
 import uuid
 from datetime import datetime
-from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, func, text
 from sqlalchemy.dialects.postgresql import TEXT, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database.models import Base
-
-if TYPE_CHECKING:
-    from src.embeddings.models.embedding import Embedding
-    from src.notes.models.note import Note
+from src.embeddings.models.embedding import Embedding
+from src.notes.models.note import Note
 
 
 class Article(Base):
