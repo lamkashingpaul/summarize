@@ -2,8 +2,8 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, func
-from sqlalchemy.dialects.postgresql import BOOLEAN, TEXT
+from sqlalchemy import DateTime, func, text
+from sqlalchemy.dialects.postgresql import BOOLEAN, TEXT, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database.models import Base
@@ -17,8 +17,9 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[uuid.UUID] = mapped_column(
-        TEXT,
+        UUID(as_uuid=True),
         primary_key=True,
+        server_default=text("gen_random_uuid()"),
     )
     name: Mapped[str] = mapped_column(
         TEXT,

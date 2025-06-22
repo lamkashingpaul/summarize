@@ -2,22 +2,23 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, ForeignKey, func
-from sqlalchemy.dialects.postgresql import TEXT
+from sqlalchemy import DateTime, ForeignKey, func, text
+from sqlalchemy.dialects.postgresql import TEXT, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database.models import Base
 
 if TYPE_CHECKING:
-    from src.auth.models.user import User
+    from src.users.models.user import User
 
 
 class Account(Base):
     __tablename__ = "accounts"
 
     id: Mapped[uuid.UUID] = mapped_column(
-        TEXT,
+        UUID(as_uuid=True),
         primary_key=True,
+        server_default=text("gen_random_uuid()"),
     )
     account_id: Mapped[str] = mapped_column(
         TEXT,

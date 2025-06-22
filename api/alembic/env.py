@@ -10,12 +10,12 @@ from src.analytics.models.request_log import RequestLog  # noqa: F401
 from src.articles.models.article import Article  # noqa: F401
 from src.auth.models.account import Account  # noqa: F401
 from src.auth.models.session import Session  # noqa: F401
-from src.auth.models.user import User  # noqa: F401
 from src.auth.models.verification import Verification  # noqa: F401
 from src.database.models import Base
 from src.embeddings.models.embedding import Embedding  # noqa: F401
 from src.notes.models.note import Note  # noqa: F401
 from src.settings.service import settings
+from src.users.models.user import User  # noqa: F401
 from src.utils.custom_jsonb import CustomJsonbType
 
 # this is the Alembic Config object, which provides
