@@ -25,6 +25,11 @@ services:
       - "5050:80"
     volumes:
       - pgadmin_data:/var/lib/pgadmin
+  maildev:
+    image: maildev/maildev:2.2.1
+    ports:
+      - "1080:1080"
+      - "1025:1025"
 
 volumes:
   postgres_data:

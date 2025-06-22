@@ -16,20 +16,20 @@ class ArticleResponse(BaseModel):
 class CreateArticleResponse(BaseModel):
     detail: str
 
-    model_config = {
-        "json_schema_extra": {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "detail": "Article created successfully.",
             }
         }
-    }
+    )
 
 
 class GetArticleByIdResponse(BaseModel):
     article: ArticleResponse
 
-    model_config = {
-        "json_schema_extra": {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "article": {
                     "id": "123e4567-e89b-12d3-a456-426614174000",
@@ -39,14 +39,14 @@ class GetArticleByIdResponse(BaseModel):
                 }
             }
         }
-    }
+    )
 
 
 class UpdateArticleByIdResponse(BaseModel):
     article: ArticleResponse
 
-    model_config = {
-        "json_schema_extra": {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "article": {
                     "id": "123e4567-e89b-12d3-a456-426614174000",
@@ -56,7 +56,7 @@ class UpdateArticleByIdResponse(BaseModel):
                 }
             }
         }
-    }
+    )
 
 
 class SearchArticlesResponse(BaseModel):
@@ -65,8 +65,8 @@ class SearchArticlesResponse(BaseModel):
     articles_has_next_page: bool
     articles: list[ArticleResponse]
 
-    model_config = {
-        "json_schema_extra": {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "articles_total_count": 100,
                 "articles_total_pages": 10,
@@ -81,4 +81,4 @@ class SearchArticlesResponse(BaseModel):
                 ],
             }
         }
-    }
+    )
