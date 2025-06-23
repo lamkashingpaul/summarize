@@ -71,7 +71,7 @@ class Settings(CustomBaseSettings):
 
     allow_origins: list[str] = Field(description="Allowed origins for CORS")
 
-    website_url: str = Field(description="Website URL for the application")
+    web_base_url: str = Field(description="Base URL for the web application")
 
     langsmith: LangsmithConfig
     auth: AuthConfig
