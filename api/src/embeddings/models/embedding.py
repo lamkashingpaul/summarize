@@ -23,25 +23,11 @@ class Embedding(Base):
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        nullable=False,
         server_default=func.now(),
     )
-    content: Mapped[str] = mapped_column(
-        TEXT,
-        nullable=False,
-    )
-    embedding: Mapped[list[float]] = mapped_column(
-        Vector,
-        nullable=False,
-    )
-    additional_metadata: Mapped[dict] = mapped_column(
-        JSONB,
-        nullable=False,
-    )
-    article_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("articles.id"),
-    )
+    content: Mapped[str] = mapped_column(TEXT)
+    embedding: Mapped[list[float]] = mapped_column(Vector)
+    additional_metadata: Mapped[dict] = mapped_column(JSONB)
+    article_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("articles.id"))
 
-    article: Mapped["Article"] = relationship(
-        back_populates="embeddings",
-    )
+    article: Mapped["Article"] = relationship(back_populates="embeddings")

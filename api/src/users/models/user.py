@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from typing import Optional
 
 from sqlalchemy import DateTime, func, text
 from sqlalchemy.dialects.postgresql import BOOLEAN, TEXT, UUID
@@ -18,30 +19,16 @@ class User(Base):
         primary_key=True,
         server_default=text("gen_random_uuid()"),
     )
-    name: Mapped[str] = mapped_column(
-        TEXT,
-        nullable=False,
-    )
-    email: Mapped[str] = mapped_column(
-        TEXT,
-        nullable=False,
-        unique=True,
-    )
-    is_email_verified: Mapped[bool] = mapped_column(
-        BOOLEAN,
-        nullable=False,
-    )
-    image_url: Mapped[str] = mapped_column(
-        TEXT,
-    )
+    name: Mapped[str] = mapped_column(TEXT)
+    email: Mapped[str] = mapped_column(TEXT, unique=True)
+    is_email_verified: Mapped[bool] = mapped_column(BOOLEAN)
+    image_url: Mapped[Optional[str]] = mapped_column(TEXT)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        nullable=False,
         server_default=func.now(),
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        nullable=False,
         server_default=func.now(),
         onupdate=func.now(),
     )

@@ -16,18 +16,9 @@ class Verification(Base):
         primary_key=True,
         server_default=text("gen_random_uuid()"),
     )
-    identifier: Mapped[str] = mapped_column(
-        TEXT,
-        nullable=False,
-    )
-    value: Mapped[str] = mapped_column(
-        TEXT,
-        nullable=False,
-    )
-    expires_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        nullable=False,
-    )
+    identifier: Mapped[str] = mapped_column(TEXT)
+    value: Mapped[str] = mapped_column(TEXT)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),

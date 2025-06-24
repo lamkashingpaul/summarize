@@ -22,21 +22,10 @@ class Note(Base):
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        nullable=False,
         server_default=func.now(),
     )
-    content: Mapped[str] = mapped_column(
-        TEXT,
-        nullable=False,
-    )
-    page_numbers: Mapped[list[int]] = mapped_column(
-        ARRAY(INTEGER),
-        nullable=False,
-    )
-    article_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("articles.id"),
-    )
+    content: Mapped[str] = mapped_column(TEXT)
+    page_numbers: Mapped[list[int]] = mapped_column(ARRAY(INTEGER))
+    article_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("articles.id"))
 
-    article: Mapped["Article"] = relationship(
-        back_populates="notes",
-    )
+    article: Mapped["Article"] = relationship(back_populates="notes")

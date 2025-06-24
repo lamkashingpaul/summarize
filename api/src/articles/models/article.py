@@ -20,21 +20,11 @@ class Article(Base):
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        nullable=False,
         server_default=func.now(),
     )
-    title: Mapped[str] = mapped_column(
-        TEXT,
-        nullable=False,
-    )
-    url: Mapped[str] = mapped_column(
-        TEXT,
-        nullable=False,
-    )
-    content: Mapped[str] = mapped_column(
-        TEXT,
-        nullable=False,
-    )
+    title: Mapped[str] = mapped_column(TEXT)
+    url: Mapped[str] = mapped_column(TEXT)
+    content: Mapped[str] = mapped_column(TEXT)
 
     notes: Mapped[list["Note"]] = relationship(
         back_populates="article",

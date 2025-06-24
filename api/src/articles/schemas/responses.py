@@ -5,12 +5,22 @@ from pydantic import BaseModel, ConfigDict
 
 
 class ArticleResponse(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
     id: UUID
     title: str
     url: str
     created_at: datetime
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
+            "example": {
+                "id": "123e4567-e89b-12d3-a456-426614174000",
+                "title": "Sample Article",
+                "url": "https://arxiv.org/pdf/sample.pdf",
+                "created_at": "2023-10-01T12:00:00Z",
+            }
+        },
+    )
 
 
 class CreateArticleResponse(BaseModel):

@@ -1,15 +1,15 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class CreateRequestLogDto(BaseModel):
-    client_ip: str = Field(..., min_length=1, max_length=45)
-    method: str = Field(..., min_length=1, max_length=10)
-    path: str = Field(..., min_length=1, max_length=255)
-    query_params: dict = Field(...)
-    request_header: dict = Field(...)
-    request_body: dict = Field(...)
-    response_status: int = Field(...)
-    response_header: dict = Field(...)
-    response_body: dict = Field(...)
-    duration_ms: float = Field(...)
-    error: str = Field(..., min_length=0)
+    client_ip: str
+    method: str
+    path: str
+    query_params: dict
+    request_header: dict
+    request_body: dict
+    response_status: int
+    response_header: dict
+    response_body: dict
+    duration_ms: float
+    error: str

@@ -18,50 +18,17 @@ class RequestLog(Base):
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        nullable=False,
         server_default=func.now(),
         index=True,
     )
-    client_ip: Mapped[str] = mapped_column(
-        TEXT,
-        nullable=False,
-        index=True,
-    )
-    method: Mapped[str] = mapped_column(
-        TEXT,
-        nullable=False,
-    )
-    path: Mapped[str] = mapped_column(
-        TEXT,
-        nullable=False,
-        index=True,
-    )
-    query_params: Mapped[dict] = mapped_column(
-        JSONB,
-        nullable=False,
-    )
-    request_header: Mapped[dict] = mapped_column(
-        JSONB,
-        nullable=False,
-    )
-    request_body: Mapped[dict] = mapped_column(
-        JSONB,
-        nullable=False,
-    )
-    response_status: Mapped[int] = mapped_column(
-        INTEGER,
-        nullable=False,
-    )
-    response_header: Mapped[dict] = mapped_column(
-        JSONB,
-        nullable=False,
-    )
-    response_body: Mapped[dict] = mapped_column(
-        JSONB,
-        nullable=False,
-    )
-    duration_ms: Mapped[float] = mapped_column(
-        REAL,
-        nullable=False,
-    )
-    error: Mapped[str] = mapped_column(TEXT, nullable=False)
+    client_ip: Mapped[str] = mapped_column(TEXT, index=True)
+    method: Mapped[str] = mapped_column(TEXT)
+    path: Mapped[str] = mapped_column(TEXT, index=True)
+    query_params: Mapped[dict] = mapped_column(JSONB)
+    request_header: Mapped[dict] = mapped_column(JSONB)
+    request_body: Mapped[dict] = mapped_column(JSONB)
+    response_status: Mapped[int] = mapped_column(INTEGER)
+    response_header: Mapped[dict] = mapped_column(JSONB)
+    response_body: Mapped[dict] = mapped_column(JSONB)
+    duration_ms: Mapped[float] = mapped_column(REAL)
+    error: Mapped[str] = mapped_column(TEXT)

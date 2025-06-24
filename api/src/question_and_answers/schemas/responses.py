@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class AskQuestionResponse(BaseModel):
@@ -6,8 +6,8 @@ class AskQuestionResponse(BaseModel):
     followup_questions: list[str]
     is_related: bool
 
-    model_config = {
-        "json_schema_extra": {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "answer": "The answer to the question.",
                 "followup_questions": [
@@ -17,4 +17,4 @@ class AskQuestionResponse(BaseModel):
                 "is_related": True,
             }
         }
-    }
+    )

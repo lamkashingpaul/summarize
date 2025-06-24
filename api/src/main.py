@@ -4,6 +4,7 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
 from src.articles.controller import articles_router
+from src.auth.controller import auth_router
 from src.error_handlers.service import (
     custom_http_exception_handler,
     custom_rate_limit_exceeded_handler,
@@ -37,6 +38,7 @@ api_v1.add_middleware(
 )
 
 api_v1.include_router(health_router)
+api_v1.include_router(auth_router)
 api_v1.include_router(articles_router)
 api_v1.include_router(question_and_answers_router)
 

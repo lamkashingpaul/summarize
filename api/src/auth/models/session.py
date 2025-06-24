@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import DateTime, ForeignKey, func, text
 from sqlalchemy.dialects.postgresql import TEXT, UUID
@@ -20,37 +20,19 @@ class Session(Base):
         primary_key=True,
         server_default=text("gen_random_uuid()"),
     )
-    expires_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        nullable=False,
-    )
-    token: Mapped[str] = mapped_column(
-        TEXT,
-        nullable=False,
-        unique=True,
-    )
-    ip_address: Mapped[str] = mapped_column(
-        TEXT,
-    )
-    user_agent: Mapped[str] = mapped_column(
-        TEXT,
-    )
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    token: Mapped[str] = mapped_column(TEXT, unique=True)
+    ip_address: Mapped[Optional[str]] = mapped_column(TEXT)
+    user_agent: Mapped[Optional[str]] = mapped_column(TEXT)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        nullable=False,
         server_default=func.now(),
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        nullable=False,
         server_default=func.now(),
         onupdate=func.now(),
     )
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("users.id"),
-        nullable=False,
-    )
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
 
-    user: Mapped["User"] = relationship(
-        back_populates="sessions",
-    )
+    user: Mapped["User"] = relationship(back_populates="sessions")

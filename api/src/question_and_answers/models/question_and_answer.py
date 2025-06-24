@@ -18,22 +18,9 @@ class QuestionAndAnswer(Base):
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        nullable=False,
         server_default=func.now(),
     )
-    context: Mapped[str] = mapped_column(
-        TEXT,
-        nullable=False,
-    )
-    question: Mapped[str] = mapped_column(
-        TEXT,
-        nullable=False,
-    )
-    answer: Mapped[str] = mapped_column(
-        TEXT,
-        nullable=False,
-    )
-    followup_questions: Mapped[list[str]] = mapped_column(
-        ARRAY(TEXT),
-        nullable=False,
-    )
+    context: Mapped[str] = mapped_column(TEXT)
+    question: Mapped[str] = mapped_column(TEXT)
+    answer: Mapped[str] = mapped_column(TEXT)
+    followup_questions: Mapped[list[str]] = mapped_column(ARRAY(TEXT))
