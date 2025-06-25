@@ -80,18 +80,6 @@ class UserRegister(BaseModel):
 
 
 class EmailVerify(BaseModel):
-    email: Annotated[
-        str,
-        ...,
-        Field(description="The email address of the user."),
-        StringConstraints(
-            strip_whitespace=True,
-            to_lower=True,
-            min_length=5,
-            max_length=255,
-            pattern=r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
-        ),
-    ]
     token: Annotated[
         str,
         ...,
@@ -109,6 +97,29 @@ class EmailVerify(BaseModel):
 
 
 class VerificationEmailResend(BaseModel):
+    email: Annotated[
+        str,
+        ...,
+        Field(description="The email address of the user."),
+        StringConstraints(
+            strip_whitespace=True,
+            to_lower=True,
+            min_length=5,
+            max_length=255,
+            pattern=r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+        ),
+    ]
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "email": "foo@bar.com",
+            }
+        }
+    )
+
+
+class ResetPasswordEmailSend(BaseModel):
     email: Annotated[
         str,
         ...,

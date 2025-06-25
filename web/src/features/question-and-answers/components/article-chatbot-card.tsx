@@ -53,9 +53,10 @@ export const ArticleChatbotCard = (props: ArticleChatbotCardProps) => {
     assistantMessageId: string,
   ) => {
     try {
-      const { answer, followup_questions } = await mutateAsync({
-        question,
-      });
+      const { answer, followup_questions: followupQuestions } =
+        await mutateAsync({
+          question,
+        });
 
       setMessages((oldMessages) =>
         oldMessages.map((message) => {
@@ -70,7 +71,7 @@ export const ArticleChatbotCard = (props: ArticleChatbotCardProps) => {
             return {
               ...message,
               content: answer,
-              followupQuestions: followup_questions,
+              followupQuestions,
               isAssistantMessageLoading: false,
               error: false,
             };

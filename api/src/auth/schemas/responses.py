@@ -56,5 +56,17 @@ class ResendVerificationEmailResponse(BaseModel):
     )
 
 
+class SendResetPasswordEmailResponse(BaseModel):
+    message: str
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "message": "Reset password email sent successfully.",
+            }
+        }
+    )
+
+
 class UserLoginResponse(UserResponse, BaseModel):
     pass
