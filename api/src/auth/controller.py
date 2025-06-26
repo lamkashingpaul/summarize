@@ -1,11 +1,13 @@
 from datetime import datetime, timedelta, timezone
+from typing import Annotated, Optional
 
-from fastapi import APIRouter, BackgroundTasks, Request
+from fastapi import APIRouter, BackgroundTasks, Header, Request
 
 from src.auth.models.verification import VerificationIdentifier, VerificationType
-from src.auth.schemas.internals import CreateVerificationDto
+from src.auth.schemas.internals import CreateSessionDto, CreateVerificationDto
 from src.auth.schemas.requests import (
     EmailVerify,
+    PasswordReset,
     ResetPasswordEmailSend,
     UserLogin,
     UserRegister,
@@ -14,16 +16,20 @@ from src.auth.schemas.requests import (
 from src.auth.schemas.responses import (
     RegisterUserResponse,
     ResendVerificationEmailResponse,
+    ResetPasswordResponse,
     SendResetPasswordEmailResponse,
     UserLoginResponse,
     UserResponse,
     VerifyEmailResponse,
 )
 from src.auth.service import (
+    delete_all_user_sessions,
     delete_verifications,
-    fetch_authenticated_user_and_credentials_account,
+    fetch_credentials_account_by_email,
     fetch_verification_by_value,
     fetch_verifications,
+    save_account_password,
+    save_session,
     save_verification,
 )
 from src.database.service import SessionDep
@@ -31,8 +37,9 @@ from src.error_handlers.decorators import custom_exception_handler_for_http
 from src.errors.models import CustomHttpException
 from src.mails.tasks import send_reset_password_email_task, send_verification_email_task
 from src.rate_limiter.service import limiter
+from src.users.models.user import User
 from src.users.schemas.internals import CreateUserDto
-from src.users.service import fetch_user_by_email, save_user
+from src.users.service import fetch_authenticated_user, fetch_user_by_email, save_user
 from src.utils.custom_api_route import CustomAPIRoute
 
 auth_router = APIRouter(
@@ -78,7 +85,7 @@ async def register_user(
     token = verification.value
     background_tasks.add_task(send_verification_email_task, email=email, token=token)
 
-    return RegisterUserResponse(message="User registered successfully.")
+    return RegisterUserResponse(detail="User registered successfully.")
 
 
 @auth_router.post("/resend-verification-email")
@@ -120,7 +127,7 @@ async def resend_verification_email(
         )
 
     return ResendVerificationEmailResponse(
-        message="Verification email resent successfully."
+        detail="Verification email resent successfully."
     )
 
 
@@ -163,7 +170,7 @@ async def send_reset_password_email(
         )
 
     return SendResetPasswordEmailResponse(
-        message="If the email is registered, a reset password email has been sent."
+        detail="Reset password email sent successfully."
     )
 
 
@@ -195,23 +202,70 @@ async def verify_email(
     await delete_verifications([verification], session)
     await session.commit()
 
-    return VerifyEmailResponse(message="Email verification successful.")
+    return VerifyEmailResponse(detail="Email verification successful.")
+
+
+@auth_router.post("/reset-password")
+@custom_exception_handler_for_http
+async def reset_password(
+    password_reset: PasswordReset, session: SessionDep
+) -> ResetPasswordResponse:
+    value = password_reset.token
+    verification = await fetch_verification_by_value(
+        value=value,
+        session=session,
+        should_fail=True,
+    )
+
+    verification_type, target = VerificationIdentifier.parse(verification.identifier)
+    if verification_type != VerificationType.PASSWORD_RESET:
+        raise CustomHttpException(
+            status_code=400, detail="Invalid password reset token."
+        )
+
+    account = await fetch_credentials_account_by_email(
+        email=target, session=session, should_fail=True
+    )
+    user: User = await account.awaitable_attrs.user
+    new_password = password_reset.new_password
+    await save_account_password(account=account, password=new_password, session=session)
+
+    await delete_verifications(verifications=[verification], session=session)
+    await delete_all_user_sessions(user=user, session=session)
+    await session.commit()
+
+    return ResetPasswordResponse(detail="Password reset successful.")
 
 
 @auth_router.post("/login")
 @custom_exception_handler_for_http
 async def login_user(
-    user_login: UserLogin, session: SessionDep, background_tasks: BackgroundTasks
+    request: Request,
+    user_login: UserLogin,
+    session: SessionDep,
+    user_agent: Annotated[Optional[str], Header()],
 ) -> UserLoginResponse:
     email = user_login.email
     password = user_login.password
 
-    user, account = await fetch_authenticated_user_and_credentials_account(
+    user = await fetch_authenticated_user(
         email=email,
         password=password,
         session=session,
         should_fail=True,
     )
+
+    if not user.is_email_verified:
+        raise CustomHttpException(
+            status_code=400, detail="Email is not verified. Please verify your email."
+        )
+
+    create_session_dto = CreateSessionDto(
+        ip_address=request.client and request.client.host,
+        user_agent=user_agent,
+        user=user,
+    )
+    await save_session(create_session_dto, session)
 
     await session.commit()
     return UserLoginResponse(**UserResponse.model_construct(**user.__dict__).__dict__)

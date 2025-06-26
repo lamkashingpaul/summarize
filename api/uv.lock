@@ -868,7 +868,7 @@ wheels = [
 
 [[package]]
 name = "langgraph"
-version = "0.4.9"
+version = "0.4.10"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "langchain-core" },
@@ -878,9 +878,9 @@ dependencies = [
     { name = "pydantic" },
     { name = "xxhash" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/fe/e8/86b3db303984f4792a8bd656df637d0e134e711da07ce9d9d730d201a986/langgraph-0.4.9.tar.gz", hash = "sha256:f815d4cc804862fb32c280bb17e634c3f0e88b4e0df1fb6573aebb73fb959a1e", size = 453307 }
+sdist = { url = "https://files.pythonhosted.org/packages/58/ef/ce5f48b098f2f8a6d18fbe60ba803dca3101be5e23241b8b1f48c15b7466/langgraph-0.4.10.tar.gz", hash = "sha256:391dadf5051bab212d711da62b10ae6c97bbc912a9f812b4b27e92a934a401c6", size = 453277 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/78/6c/175e5c56b48ffe7e492f2ccda93935eb3f89e618734577933f0e4cd7522d/langgraph-0.4.9-py3-none-any.whl", hash = "sha256:03312d769edec311dac3ec9ed83a595f1a74590b9ad141387f1fb006b5b3f753", size = 152485 },
+    { url = "https://files.pythonhosted.org/packages/bf/eb/d906fa11d522f05328b8561f7035e3599b2c9fc2260cbd7d15e63a5bae7f/langgraph-0.4.10-py3-none-any.whl", hash = "sha256:fa1257afba55778f222981362c1221fb0cc166467a543c13729eb104b9becbc9", size = 152446 },
 ]
 
 [[package]]
@@ -898,15 +898,15 @@ wheels = [
 
 [[package]]
 name = "langgraph-prebuilt"
-version = "0.2.2"
+version = "0.2.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "langchain-core" },
     { name = "langgraph-checkpoint" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/88/f5/15b26cda94ebb89400048d478a3b1927005d85e273a557d8683f4cda775c/langgraph_prebuilt-0.2.2.tar.gz", hash = "sha256:0a5d1f651f97c848cd1c3dd0ef017614f47ee74effb7375b59ac639e41b253f9", size = 112785 }
+sdist = { url = "https://files.pythonhosted.org/packages/cc/45/0dfa4fb6e757773d3010e47994f9749cecedc38489f4ce56b862d7f603de/langgraph_prebuilt-0.2.3.tar.gz", hash = "sha256:4e5f81c062ae30c42384ece8d7a6e234216cf079320fd643a2cecb4cb80c33da", size = 118108 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/14/46/c98fec1f8620cbffbabda346a2c68155eec3720c6c3393ab3b9529618810/langgraph_prebuilt-0.2.2-py3-none-any.whl", hash = "sha256:72de5ef1d969a8f02ad7adc7cc1915bb9b4467912d57ba60da34b5a70fdad1f6", size = 23748 },
+    { url = "https://files.pythonhosted.org/packages/49/75/fb26334afc7471b3c8928adb0eee1c48957710472fc83c5463e4fed4e49a/langgraph_prebuilt-0.2.3-py3-none-any.whl", hash = "sha256:efa0bdfaf6e0b5b20e4fa55193ba7871c4aae70026be1c51d3960cb1742404c9", size = 23785 },
 ]
 
 [[package]]

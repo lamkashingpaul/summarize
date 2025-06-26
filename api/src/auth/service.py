@@ -1,35 +1,27 @@
 import secrets
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Literal, Optional, Sequence, overload
 
 from argon2 import PasswordHasher
-from argon2.exceptions import VerifyMismatchError
-from sqlalchemy import select
+from sqlalchemy import delete, select
 
 from src.auth.models.account import Account
+from src.auth.models.session import Session
 from src.auth.models.verification import (
     Verification,
     VerificationIdentifier,
     VerificationType,
 )
-from src.auth.schemas.internals import CreateVerificationDto
+from src.auth.schemas.internals import CreateSessionDto, CreateVerificationDto
 from src.database.service import SessionDep
 from src.errors.models import (
-    CustomDatabaseInternalServerErrorException,
     CustomDatabaseNotFoundException,
 )
+from src.settings.service import settings
 from src.users.models.user import User
 
 
-async def save_verification(
-    create_verification_dto: CreateVerificationDto, session: SessionDep
-) -> Verification:
-    verification_type = create_verification_dto.verification_type
-    target = create_verification_dto.target
-    identifier = VerificationIdentifier.build(
-        verification_type=verification_type, target=target
-    )
-    expires_at = create_verification_dto.expires_at
+async def generate_unique_verification_value(identifier: str, session: SessionDep):
     value = ""
 
     while True:
@@ -46,6 +38,36 @@ async def save_verification(
         verifications = result.all()
         if not verifications:
             break
+
+    return value
+
+
+async def generate_unique_session_token(session: SessionDep):
+    token = ""
+
+    while True:
+        token = secrets.token_hex(16)
+        statement = select(Session).where(Session.token == token).limit(1)
+        result = await session.scalars(statement)
+        sessions = result.all()
+        if not sessions:
+            break
+
+    return token
+
+
+async def save_verification(
+    create_verification_dto: CreateVerificationDto, session: SessionDep
+) -> Verification:
+    verification_type = create_verification_dto.verification_type
+    target = create_verification_dto.target
+    identifier = VerificationIdentifier.build(
+        verification_type=verification_type, target=target
+    )
+    expires_at = create_verification_dto.expires_at
+    value = await generate_unique_verification_value(
+        identifier=identifier, session=session
+    )
 
     verification = Verification(
         identifier=identifier,
@@ -110,8 +132,9 @@ async def fetch_verifications(
 async def delete_verifications(
     verifications: Sequence[Verification], session: SessionDep
 ):
-    for verification in verifications:
-        await session.delete(verification)
+    verification_ids = [verification.id for verification in verifications]
+    statement = delete(Verification).where(Verification.id.in_(verification_ids))
+    await session.execute(statement)
 
 
 @overload
@@ -130,7 +153,6 @@ async def fetch_credentials_account_by_email(
         .join(Account.user)
         .where(
             User.email == email,
-            User.is_email_verified.is_(True),
             Account.provider_id == "credentials",
         )
         .limit(2)
@@ -148,51 +170,28 @@ async def fetch_credentials_account_by_email(
     return account
 
 
-@overload
-async def fetch_authenticated_user_and_credentials_account(
-    email: str, password: str, session: SessionDep, should_fail: Literal[True]
-) -> tuple[User, Account]: ...
-@overload
-async def fetch_authenticated_user_and_credentials_account(
-    email: str, password: str, session: SessionDep, should_fail: Literal[False] = False
-) -> tuple[Optional[User], Optional[Account]]: ...
-async def fetch_authenticated_user_and_credentials_account(
-    email: str, password: str, session: SessionDep, should_fail: bool = False
-) -> tuple[Optional[User], Optional[Account]]:
-    account = await fetch_credentials_account_by_email(email, session, should_fail)
-    if not account:
-        if should_fail:
-            raise CustomDatabaseNotFoundException(
-                message=f"Credentials account with email '{email}' not found"
-            )
-        return None, None
-
-    user: User = await account.awaitable_attrs.user
-
+async def save_account_password(account: Account, password: str, session: SessionDep):
     password_hasher = PasswordHasher()
-    hashed_password = account.password
-    if hashed_password is None:
-        if should_fail:
-            raise CustomDatabaseNotFoundException(
-                message=f"Credentials account with email '{email}' has no password set"
-            )
-        return None, None
+    account.password = password_hasher.hash(password)
+    session.add(account)
 
-    try:
-        password_hasher.verify(hashed_password, password)
-        if password_hasher.check_needs_rehash(hashed_password):
-            account.password = password_hasher.hash(password)
-        return user, account
 
-    except VerifyMismatchError as e:
-        if should_fail:
-            raise CustomDatabaseNotFoundException(
-                message="Invalid email or password"
-            ) from e
-        return None, None
-    except Exception as e:
-        if should_fail:
-            raise CustomDatabaseInternalServerErrorException(
-                message="An error occurred while verifying the password"
-            ) from e
-        return None, None
+async def delete_all_user_sessions(user: User, session: SessionDep):
+    statement = delete(Session).where(Session.user_id == user.id)
+    await session.execute(statement)
+
+
+async def save_session(create_session_dto: CreateSessionDto, session: SessionDep):
+    session_expires_in = settings.auth.session_expires_in
+    expires_at = datetime.now(timezone.utc) + timedelta(seconds=session_expires_in)
+    token = await generate_unique_session_token(session)
+
+    user_session = Session(
+        expires_at=expires_at,
+        token=token,
+        ip_address=create_session_dto.ip_address,
+        user_agent=create_session_dto.user_agent,
+        user=create_session_dto.user,
+    )
+    session.add(user_session)
+    return user_session

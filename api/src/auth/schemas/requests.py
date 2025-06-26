@@ -79,23 +79,6 @@ class UserRegister(BaseModel):
         return value
 
 
-class EmailVerify(BaseModel):
-    token: Annotated[
-        str,
-        ...,
-        Field(description="The verification token sent to the user's email."),
-    ]
-
-    model_config = ConfigDict(
-        json_schema_extra={
-            "example": {
-                "email": "foo@bar.com",
-                "token": "1234567890abcdef",
-            }
-        }
-    )
-
-
 class VerificationEmailResend(BaseModel):
     email: Annotated[
         str,
@@ -137,6 +120,45 @@ class ResetPasswordEmailSend(BaseModel):
         json_schema_extra={
             "example": {
                 "email": "foo@bar.com",
+            }
+        }
+    )
+
+
+class EmailVerify(BaseModel):
+    token: Annotated[
+        str,
+        ...,
+        Field(description="The verification token sent to the user's email."),
+    ]
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "email": "foo@bar.com",
+                "token": "1234567890abcdef",
+            }
+        }
+    )
+
+
+class PasswordReset(BaseModel):
+    token: Annotated[
+        str,
+        ...,
+        Field(description="The password reset token sent to the user's email."),
+    ]
+    new_password: Annotated[
+        str,
+        ...,
+        Field(description="The new password for the user account."),
+    ]
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "token": "1234567890abcdef",
+                "new_password": "new_secure_password",
             }
         }
     )

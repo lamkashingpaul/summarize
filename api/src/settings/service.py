@@ -33,15 +33,7 @@ class SmtpConfig(CustomBaseSettings):
 
 
 class AuthConfig(CustomBaseSettings):
-    jwt_access_token_secret: str = Field(description="JWT access token secret")
-    jwt_access_token_expires_in: int = Field(
-        description="JWT access token expiration time in seconds"
-    )
-    jwt_refresh_token_algorithm: str = Field(description="JWT refresh token algorithm")
-    jwt_refresh_token_secret: str = Field(description="JWT refresh token secret")
-    jwt_refresh_token_expires_in: int = Field(
-        description="JWT refresh token expiration time in seconds"
-    )
+    session_expires_in: int = Field(description="Session expiration time in seconds")
 
 
 class LangsmithConfig(CustomBaseSettings):

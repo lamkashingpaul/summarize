@@ -5,7 +5,7 @@ from src.settings.service import settings
 async def send_verification_email_task(email: str, token: str) -> None:
     subject = "Please verify your email address"
     plain = (
-        f"Click the link to verify your email:\n"
+        f"Click the link to verify your email: "
         f"{settings.web_base_url}/auth/verify-email?token={token}"
     )
 
@@ -15,7 +15,7 @@ async def send_verification_email_task(email: str, token: str) -> None:
 async def send_reset_password_email_task(email: str, token: str) -> None:
     subject = "Reset your password"
     plain = (
-        f"Click the link to reset your password:\n"
+        f"Click the link to reset your password: "
         f"{settings.web_base_url}/auth/reset-password?token={token}"
     )
 

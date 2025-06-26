@@ -17,6 +17,7 @@ from src.middlewares.request_body_size_limiter import RequestBodySizeLimiter
 from src.question_and_answers.controller import question_and_answers_router
 from src.rate_limiter.service import limiter
 from src.settings.service import settings
+from src.users.controller import users_router
 
 app = FastAPI(root_path="/api")
 
@@ -39,6 +40,7 @@ api_v1.add_middleware(
 
 api_v1.include_router(health_router)
 api_v1.include_router(auth_router)
+api_v1.include_router(users_router)
 api_v1.include_router(articles_router)
 api_v1.include_router(question_and_answers_router)
 
