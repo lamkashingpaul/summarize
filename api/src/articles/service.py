@@ -32,7 +32,7 @@ async def fetch_article_by_id(
         statement = select(Article).where(Article.id == article_id).limit(2)
         articles = (await session.scalars(statement)).all()
 
-        if not articles or len(articles) != 1:
+        if len(articles) != 1:
             if should_fail:
                 raise CustomDatabaseNotFoundException(
                     message=f"Article with id: {article_id} not found"
@@ -62,7 +62,7 @@ async def fetch_article_by_url(
         statement = select(Article).where(Article.url == url).limit(2)
         articles = (await session.scalars(statement)).all()
 
-        if not articles or len(articles) != 1:
+        if len(articles) != 1:
             if should_fail:
                 raise CustomDatabaseNotFoundException(
                     message=f"Article with url: {url} not found"

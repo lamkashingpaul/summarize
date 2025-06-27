@@ -7,12 +7,15 @@ from sqlalchemy.dialects.postgresql import TEXT, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database.models import Base
+from src.utils.constants import SESSION_COOKIE_NAME
 
 if TYPE_CHECKING:
     from src.users.models.user import User
 
 
 class Session(Base):
+    KEY_NAME = SESSION_COOKIE_NAME
+
     __tablename__ = "sessions"
 
     id: Mapped[uuid.UUID] = mapped_column(

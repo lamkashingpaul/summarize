@@ -103,7 +103,7 @@ async def fetch_verification_by_value(
     result = await session.scalars(statement)
     verifications = result.all()
 
-    if not verifications or len(verifications) != 1:
+    if len(verifications) != 1:
         if should_fail:
             raise CustomDatabaseNotFoundException(
                 message=f"Verification with value '{value}' not found"
@@ -159,7 +159,7 @@ async def fetch_credentials_account_by_email(
     )
     result = await session.scalars(statement)
     accounts = result.all()
-    if not accounts or len(accounts) != 1:
+    if len(accounts) != 1:
         if should_fail:
             raise CustomDatabaseNotFoundException(
                 message=f"Credentials account with email '{email}' not found"

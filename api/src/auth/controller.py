@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta, timezone
 from typing import Annotated, Optional
 
-from fastapi import APIRouter, BackgroundTasks, Header, Request
+from fastapi import APIRouter, BackgroundTasks, Header, Request, Response
 
+from src.auth.dependencies import OptionalSessionUser
+from src.auth.models.session import Session
 from src.auth.models.verification import VerificationIdentifier, VerificationType
 from src.auth.schemas.internals import CreateSessionDto, CreateVerificationDto
 from src.auth.schemas.requests import (
@@ -14,11 +16,12 @@ from src.auth.schemas.requests import (
     VerificationEmailResend,
 )
 from src.auth.schemas.responses import (
+    LoginResponse,
+    LogoutResponse,
     RegisterUserResponse,
     ResendVerificationEmailResponse,
     ResetPasswordResponse,
     SendResetPasswordEmailResponse,
-    UserLoginResponse,
     UserResponse,
     VerifyEmailResponse,
 )
@@ -37,6 +40,7 @@ from src.error_handlers.decorators import custom_exception_handler_for_http
 from src.errors.models import CustomHttpException
 from src.mails.tasks import send_reset_password_email_task, send_verification_email_task
 from src.rate_limiter.service import limiter
+from src.settings.service import settings
 from src.users.models.user import User
 from src.users.schemas.internals import CreateUserDto
 from src.users.service import fetch_authenticated_user, fetch_user_by_email, save_user
@@ -200,8 +204,8 @@ async def verify_email(
     session.add(user)
 
     await delete_verifications([verification], session)
-    await session.commit()
 
+    await session.commit()
     return VerifyEmailResponse(detail="Email verification successful.")
 
 
@@ -232,19 +236,20 @@ async def reset_password(
 
     await delete_verifications(verifications=[verification], session=session)
     await delete_all_user_sessions(user=user, session=session)
-    await session.commit()
 
+    await session.commit()
     return ResetPasswordResponse(detail="Password reset successful.")
 
 
 @auth_router.post("/login")
 @custom_exception_handler_for_http
-async def login_user(
+async def login(
     request: Request,
+    response: Response,
     user_login: UserLogin,
     session: SessionDep,
     user_agent: Annotated[Optional[str], Header()],
-) -> UserLoginResponse:
+) -> LoginResponse:
     email = user_login.email
     password = user_login.password
 
@@ -265,7 +270,34 @@ async def login_user(
         user_agent=user_agent,
         user=user,
     )
-    await save_session(create_session_dto, session)
+    user_session = await save_session(create_session_dto, session)
 
     await session.commit()
-    return UserLoginResponse(**UserResponse.model_construct(**user.__dict__).__dict__)
+
+    response.set_cookie(
+        key=Session.KEY_NAME,
+        value=user_session.token,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=settings.auth.session_expires_in,
+    )
+    return LoginResponse(**UserResponse.model_construct(**user.__dict__).__dict__)
+
+
+@auth_router.post("/logout")
+@custom_exception_handler_for_http
+async def logout(
+    response: Response,
+    session: SessionDep,
+    user: OptionalSessionUser,
+) -> LogoutResponse:
+    await session.commit()
+
+    response.delete_cookie(
+        key=Session.KEY_NAME,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+    )
+    return LogoutResponse(detail="User logged out successfully.")

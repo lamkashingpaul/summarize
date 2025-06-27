@@ -63,5 +63,17 @@ class ResetPasswordResponse(BaseModel):
     )
 
 
-class UserLoginResponse(UserResponse, BaseModel):
+class LoginResponse(UserResponse, BaseModel):
     pass
+
+
+class LogoutResponse(BaseModel):
+    detail: str
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "message": "Logout successful.",
+            }
+        }
+    )

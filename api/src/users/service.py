@@ -59,7 +59,7 @@ async def fetch_user_by_email(
         statement = select(User).where(User.email == email).limit(2)
         users = (await session.scalars(statement)).all()
 
-        if not users or len(users) != 1:
+        if len(users) != 1:
             if should_fail:
                 raise CustomDatabaseNotFoundException(
                     message=f"User with email: '{email}' not found"
