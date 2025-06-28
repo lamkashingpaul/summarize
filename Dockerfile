@@ -27,7 +27,7 @@ RUN uv sync --frozen --no-cache
 CMD ["/app/.venv/bin/fastapi", "run", "src/main.py", "--port", "80"]
 
 # web
-FROM node:24.2.0-slim AS web-base
+FROM node:24.3.0-slim AS web-base
 ENV NODE_ENV=production
 ENV CI=1
 ENV PNPM_HOME=/pnpm

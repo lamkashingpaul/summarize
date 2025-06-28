@@ -1,9 +1,10 @@
 import os
-from typing import Literal, Optional
+from typing import Literal, Optional, TypeGuard
 
 from pydantic import Field, PostgresDsn, RedisDsn, computed_field
 from pydantic_settings import SettingsConfigDict
 
+from src.settings.schemas.internals import ConfiguredGmailConfig
 from src.settings.utils import CustomBaseSettings
 
 Environment = Literal["development", "production"]
@@ -15,6 +16,7 @@ if env == "production":
 
 
 class GmailConfig(CustomBaseSettings):
+    oauth2_token_url: Optional[str] = Field(description="Gmail OAuth2 token URL")
     user: Optional[str] = Field(description="Gmail user email address")
     client_id: Optional[str] = Field(description="Gmail OAuth2 client ID")
     client_secret: Optional[str] = Field(description="Gmail OAuth2 client secret")
@@ -23,7 +25,15 @@ class GmailConfig(CustomBaseSettings):
     @computed_field(description="Check if Gmail is configured")
     @property
     def is_gmail_configured(self) -> bool:
-        return all([self.user, self.client_id, self.client_secret, self.refresh_token])
+        return all(
+            [
+                self.oauth2_token_url,
+                self.user,
+                self.client_id,
+                self.client_secret,
+                self.refresh_token,
+            ]
+        )
 
 
 class SmtpConfig(CustomBaseSettings):
@@ -68,6 +78,10 @@ class Settings(CustomBaseSettings):
     langsmith: LangsmithConfig
     auth: AuthConfig
     smtp: SmtpConfig
+
+
+def is_gmail_configured(config: GmailConfig) -> TypeGuard[ConfiguredGmailConfig]:
+    return config.is_gmail_configured
 
 
 settings = Settings.model_validate({})

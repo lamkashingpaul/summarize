@@ -1,4 +1,7 @@
 from dataclasses import dataclass
+from typing import Optional
+
+from src.settings.schemas.internals import ConfiguredGmailConfig
 
 
 @dataclass
@@ -7,3 +10,11 @@ class SendEmailConfig:
     port: int
     start_tls: bool
     use_tls: bool
+
+    gmail_config: Optional[ConfiguredGmailConfig]
+
+
+@dataclass
+class TokenCache:
+    access_token: Optional[str] = None
+    expires_at: int = 0

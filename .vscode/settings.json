@@ -47,7 +47,8 @@
     "turbopack",
     "unrs",
     "venv",
-    "vercel"
+    "vercel",
+    "XOAUTH"
   ],
   "python.analysis.extraPaths": ["./api"]
 }
