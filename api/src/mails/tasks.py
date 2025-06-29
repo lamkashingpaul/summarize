@@ -9,7 +9,7 @@ async def send_verification_email_task(email: str, token: str) -> None:
         f"{settings.web_base_url}/auth/verify-email?token={token}"
     )
 
-    await send_email(bcc_emails=[email], subject=subject, plain=plain, html=plain)
+    await send_email(to_email=email, subject=subject, plain=plain, html=plain)
 
 
 async def send_reset_password_email_task(email: str, token: str) -> None:
@@ -19,4 +19,4 @@ async def send_reset_password_email_task(email: str, token: str) -> None:
         f"{settings.web_base_url}/auth/reset-password?token={token}"
     )
 
-    await send_email(bcc_emails=[email], subject=subject, plain=plain, html=plain)
+    await send_email(to_email=email, subject=subject, plain=plain, html=plain)

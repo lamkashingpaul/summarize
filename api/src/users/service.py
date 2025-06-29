@@ -3,7 +3,6 @@ from typing import Literal, Optional, overload
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from sqlalchemy import select
-from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 
 from src.auth.models.account import Account
 from src.auth.service import fetch_credentials_account_by_email
@@ -55,23 +54,17 @@ async def fetch_user_by_email(
 async def fetch_user_by_email(
     email: str, session: SessionDep, should_fail: bool = False
 ) -> Optional[User]:
-    try:
-        statement = select(User).where(User.email == email).limit(2)
-        users = (await session.scalars(statement)).all()
+    statement = select(User).where(User.email == email).limit(2)
+    users = (await session.scalars(statement)).all()
 
-        if len(users) != 1:
-            if should_fail:
-                raise CustomDatabaseNotFoundException(
-                    message=f"User with email: '{email}' not found"
-                )
-            return None
+    if len(users) != 1:
+        if should_fail:
+            raise CustomDatabaseNotFoundException(
+                message=f"User with email: '{email}' not found"
+            )
+        return None
 
-        return users[0]
-
-    except (NoResultFound, MultipleResultsFound) as e:
-        raise CustomDatabaseNotFoundException(
-            message=f"User with email: '{email}' not found"
-        ) from e
+    return users[0]
 
 
 @overload

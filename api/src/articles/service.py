@@ -2,7 +2,6 @@ from typing import Literal, Optional, overload
 from uuid import UUID
 
 from sqlalchemy import func, select
-from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 
 from src.articles.models.article import Article
 from src.articles.schemas.internals import CreateArticleDto, FindArticlesReturn
@@ -28,23 +27,17 @@ async def fetch_article_by_id(
 async def fetch_article_by_id(
     article_id: UUID, session: SessionDep, should_fail: bool = False
 ) -> Optional[Article]:
-    try:
-        statement = select(Article).where(Article.id == article_id).limit(2)
-        articles = (await session.scalars(statement)).all()
+    statement = select(Article).where(Article.id == article_id).limit(2)
+    articles = (await session.scalars(statement)).all()
 
-        if len(articles) != 1:
-            if should_fail:
-                raise CustomDatabaseNotFoundException(
-                    message=f"Article with id: {article_id} not found"
-                )
-            return None
+    if len(articles) != 1:
+        if should_fail:
+            raise CustomDatabaseNotFoundException(
+                message=f"Article with id: {article_id} not found"
+            )
+        return None
 
-        return articles[0]
-
-    except (NoResultFound, MultipleResultsFound) as e:
-        raise CustomDatabaseNotFoundException(
-            message=f"Article with id: {article_id} not found"
-        ) from e
+    return articles[0]
 
 
 @overload
@@ -58,23 +51,17 @@ async def fetch_article_by_url(
 async def fetch_article_by_url(
     url: str, session: SessionDep, should_fail: bool = False
 ) -> Optional[Article]:
-    try:
-        statement = select(Article).where(Article.url == url).limit(2)
-        articles = (await session.scalars(statement)).all()
+    statement = select(Article).where(Article.url == url).limit(2)
+    articles = (await session.scalars(statement)).all()
 
-        if len(articles) != 1:
-            if should_fail:
-                raise CustomDatabaseNotFoundException(
-                    message=f"Article with url: {url} not found"
-                )
-            return None
+    if len(articles) != 1:
+        if should_fail:
+            raise CustomDatabaseNotFoundException(
+                message=f"Article with url: {url} not found"
+            )
+        return None
 
-        return articles[0]
-
-    except (NoResultFound, MultipleResultsFound) as e:
-        raise CustomDatabaseNotFoundException(
-            message=f"Article with url: {url} not found"
-        ) from e
+    return articles[0]
 
 
 async def find_articles(
