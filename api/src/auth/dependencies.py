@@ -29,7 +29,7 @@ class GetSessionUser:
                 )
             return None
 
-        statement = select(Session).where(Session.token == session_token)
+        statement = select(Session).where(Session.token == session_token).limit(2)
         user_session = (await session.scalars(statement)).one_or_none()
         if user_session is None:
             if required:

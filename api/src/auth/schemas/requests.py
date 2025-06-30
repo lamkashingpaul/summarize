@@ -61,6 +61,12 @@ class UserRegister(BaseModel):
     @field_validator("password", mode="before")
     @classmethod
     def validate_password(cls, value: str) -> str:
+        if len(value) < 8:
+            raise ValueError("Password must be at least 8 characters long.")
+
+        if len(value) > 128:
+            raise ValueError("Password must not exceed 128 characters.")
+
         if not any(char.isalpha() for char in value):
             raise ValueError("Password must contain at least one letter.")
 

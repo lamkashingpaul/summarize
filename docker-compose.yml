@@ -17,7 +17,7 @@ services:
     ports:
       - "6379:6379"
   pgadmin4:
-    image: dpage/pgadmin4:9.4.0
+    image: dpage/pgadmin4:9.5.0
     environment:
       PGADMIN_DEFAULT_EMAIL: postgres@postgres.com
       PGADMIN_DEFAULT_PASSWORD: postgres@postgres.com
