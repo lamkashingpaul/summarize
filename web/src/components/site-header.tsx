@@ -1,5 +1,7 @@
 import { ModeToggle } from "@/components/mode-toggle";
+import { Button } from "@/components/ui/button";
 import { ComingSoonButton } from "@/components/ui/coming-soon-button";
+import Link from "next/link";
 
 export const SiteHeader = () => {
   return (
@@ -13,7 +15,9 @@ export const SiteHeader = () => {
           <div className="flex items-center gap-2">
             <ModeToggle />
             <ComingSoonButton variant="ghost">Sign In</ComingSoonButton>
-            <ComingSoonButton>Sign Up</ComingSoonButton>
+            <Button asChild>
+              <Link href="/auth/sign-up">Sign Up</Link>
+            </Button>
           </div>
         </div>
       </div>

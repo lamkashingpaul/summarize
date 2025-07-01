@@ -1,7 +1,7 @@
 import { getArticleByIdSchema } from "@/features/articles/schemas";
 import { GetArticleByIdResponse } from "@/features/articles/types";
 import { customFetch } from "@/lib/axois";
-import { ReactQueryError } from "@/lib/react-query";
+import { ReactQueryError } from "@/types";
 import {
   queryOptions,
   useQuery,

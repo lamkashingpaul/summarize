@@ -3,9 +3,6 @@ import {
   isServer,
   QueryClient,
 } from "@tanstack/react-query";
-import { AxiosError } from "axios";
-
-export type ReactQueryError = AxiosError | Error;
 
 function makeQueryClient() {
   return new QueryClient({

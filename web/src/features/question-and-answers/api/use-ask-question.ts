@@ -1,7 +1,7 @@
 import { askQuestionSchema } from "@/features/question-and-answers/schemas";
 import { AskQuestionResponse } from "@/features/question-and-answers/types";
 import { customFetch } from "@/lib/axois";
-import { ReactQueryError } from "@/lib/react-query";
+import { ReactQueryError } from "@/types";
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { z } from "zod/v4";
 

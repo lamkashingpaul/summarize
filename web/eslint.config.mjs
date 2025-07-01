@@ -26,7 +26,12 @@ export default defineConfig([
   ...pluginQuery.configs["flat/recommended"],
   ...compat.config({
     extends: ["next", "next/core-web-vitals", "next/typescript", "prettier"],
+    plugins: ["prettier"],
     rules: {
+      "prettier/prettier": [
+        "error",
+        { endOfLine: "auto", plugins: ["prettier-plugin-tailwindcss"] },
+      ],
       "no-console": "error",
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-vars": [

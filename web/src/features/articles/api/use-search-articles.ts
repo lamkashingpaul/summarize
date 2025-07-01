@@ -1,7 +1,7 @@
 import { searchArticlesSchema } from "@/features/articles/schemas";
 import { SearchArticlesResponse } from "@/features/articles/types";
 import { customFetch } from "@/lib/axois";
-import { ReactQueryError } from "@/lib/react-query";
+import { ReactQueryError } from "@/types";
 import {
   InfiniteData,
   QueryKey,
