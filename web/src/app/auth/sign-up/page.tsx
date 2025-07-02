@@ -13,7 +13,7 @@ import Link from "next/link";
 
 export default function SignUpPage() {
   return (
-    <section className="py-12 md:py-24 lg:py-32">
+    <section className="py-6 md:py-12 lg:py-12">
       <div className="container-wrapper !max-w-md">
         <div className="container">
           <div className="mb-8 text-center">
