@@ -218,8 +218,12 @@ async def reset_password(
     verification = await fetch_verification_by_value(
         value=value,
         session=session,
-        should_fail=True,
+        should_fail=False,
     )
+    if not verification:
+        raise CustomHttpException(
+            status_code=400, detail="Invalid password reset token."
+        )
 
     verification_type, target = VerificationIdentifier.parse(verification.identifier)
     if verification_type != VerificationType.PASSWORD_RESET:

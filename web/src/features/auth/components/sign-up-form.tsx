@@ -24,6 +24,7 @@ import { ButtonWithLoading } from "@/components/ui/button-with-loading";
 import { useEffect } from "react";
 
 type SignUpFormInput = z.input<typeof signUpSchema>;
+type SignUpFormOutput = z.output<typeof signUpSchema>;
 
 export const SignUpForm = () => {
   const {
@@ -43,11 +44,10 @@ export const SignUpForm = () => {
     control,
     setError,
     reset,
-    clearErrors,
     formState: { errors, isSubmitSuccessful },
   } = form;
 
-  const onSubmit: SubmitHandler<SignUpFormInput> = async (data) => {
+  const onSubmit: SubmitHandler<SignUpFormOutput> = async (data) => {
     try {
       await signUp(data);
     } catch (error) {
@@ -60,7 +60,7 @@ export const SignUpForm = () => {
     if (isSubmitSuccessful) {
       reset({ ...getSignUpFormDefaultValues, agreedToTerms: true });
     }
-  }, [isSubmitSuccessful, reset, clearErrors]);
+  }, [isSubmitSuccessful, reset]);
 
   return (
     <Form {...form}>
@@ -231,4 +231,4 @@ const getSignUpFormDefaultValues = {
   confirmPassword: "",
   agreedToTerms: false,
   subscribeToNewsletter: true,
-} as SignUpFormInput;
+} satisfies SignUpFormInput;
