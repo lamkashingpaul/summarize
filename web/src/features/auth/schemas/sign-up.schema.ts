@@ -1,3 +1,4 @@
+import { emailSchema } from "@/features/auth/schemas/email.schema";
 import { passwordSchema } from "@/features/auth/schemas/password.schema";
 import { z } from "zod/v4";
 
@@ -8,16 +9,7 @@ export const signUpSchema = z
       .trim()
       .min(1, "Name is required")
       .max(255, "Name must be at most 255 characters long"),
-    email: z
-      .email({
-        error: (issue) => {
-          if (!issue.input) {
-            return "Email is required";
-          }
-          return "Invalid email address";
-        },
-      })
-      .min(1, "Email is required"),
+    email: emailSchema,
     password: passwordSchema,
     confirmPassword: passwordSchema,
     agreedToTerms: z.boolean(),

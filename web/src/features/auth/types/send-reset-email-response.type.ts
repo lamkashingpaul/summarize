@@ -1,3 +1,3 @@
-export type sendResetEmailResponse = {
+export type SendResetEmailResponse = {
   detail: string;
 };

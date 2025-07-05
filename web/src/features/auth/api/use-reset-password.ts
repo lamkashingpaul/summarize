@@ -1,6 +1,7 @@
 import { resetPasswordSchema } from "@/features/auth/schemas";
 import { ResetPasswordResponse } from "@/features/auth/types";
 import { customFetch } from "@/lib/axois";
+import { ReactQueryError } from "@/types";
 import { useMutation } from "@tanstack/react-query";
 import { z } from "zod/v4";
 
@@ -14,10 +15,14 @@ const resetPassword = async (body: ResetPasswordDto) => {
   return response.data;
 };
 
-const resetPasswordMutationKey = ["auth", "reset-password"];
+const resetPasswordMutationKey = ["auth", "reset-password"] as const;
 
 export const useResetPassword = () => {
-  const mutation = useMutation({
+  const mutation = useMutation<
+    ResetPasswordResponse,
+    ReactQueryError,
+    ResetPasswordDto
+  >({
     mutationKey: resetPasswordMutationKey,
     mutationFn: resetPassword,
   });

@@ -35,7 +35,12 @@ export const useAskQuestion = (
     AskQuestionBodyDto
   >({
     mutationFn: (body) => askQuestion(articleId, body),
-    mutationKey: ["question-ans-answers", "articles", articleId, "questions"],
+    mutationKey: [
+      "question-ans-answers",
+      "articles",
+      articleId,
+      "questions",
+    ] as const,
     ...options,
   });
 
