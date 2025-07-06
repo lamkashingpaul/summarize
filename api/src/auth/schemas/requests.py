@@ -188,12 +188,20 @@ class UserLogin(BaseModel):
         ...,
         Field(description="The password for the user account."),
     ]
+    remember_me: Annotated[
+        Optional[bool],
+        Field(
+            description="Whether to remember the user on this device.",
+            default=False,
+        ),
+    ] = False
 
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
                 "email": "foo@bar.com",
                 "password": "1234567890abcdef",
+                "remember_me": True,
             }
         }
     )

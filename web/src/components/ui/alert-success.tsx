@@ -7,17 +7,20 @@ import {
 import { cn } from "@/lib/utils";
 import { CheckCircle2Icon } from "lucide-react";
 
-type AlertSuccessProps = AlertProps & {
-  icon?: React.ReactNode;
-  title?: string;
-  description?: string;
+type AlertSuccessProps = Omit<AlertProps, "title"> & {
+  icon?: React.ReactNode | null;
+  title?: string | null;
+  description?: string | null;
 };
 
 export const AlertSuccess = (props: AlertSuccessProps) => {
-  const { icon, title, description, className, ...rest } = props;
-
-  const alertIcon = icon || <CheckCircle2Icon />;
-  const alertTitle = title || "Success";
+  const {
+    icon = <CheckCircle2Icon />,
+    title = "Success",
+    description = "Operation completed successfully.",
+    className,
+    ...rest
+  } = props;
 
   return (
     <Alert
@@ -25,9 +28,11 @@ export const AlertSuccess = (props: AlertSuccessProps) => {
       variant="default"
       {...rest}
     >
-      {alertIcon}
-      <AlertTitle>{alertTitle}</AlertTitle>
-      {description && <AlertDescription>{description}</AlertDescription>}
+      {icon !== null ? icon : null}
+      {title !== null ? <AlertTitle>{title}</AlertTitle> : null}
+      {description !== null ? (
+        <AlertDescription>{description}</AlertDescription>
+      ) : null}
     </Alert>
   );
 };

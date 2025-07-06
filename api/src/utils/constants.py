@@ -1,1 +1,1 @@
-SESSION_COOKIE_NAME = "session_token"
+SESSION_COOKIE_NAME = "summarize_session_token"

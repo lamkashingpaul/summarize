@@ -30,11 +30,11 @@ function ResetPasswordPage() {
         <div className="container">
           <div className="mb-8 text-center">
             <Link
-              href="/"
+              href="/auth/sign-in"
               className="text-muted-foreground hover:text-foreground mb-6 inline-flex items-center gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
-              <span>Back to Summarize</span>
+              <span>Back to Sign In</span>
             </Link>
             <div className="mb-2 flex items-center justify-center gap-2">
               <FileText className="text-primary h-8 w-8" />

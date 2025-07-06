@@ -184,29 +184,26 @@ async def verify_email(
     email_verify: EmailVerify, session: SessionDep
 ) -> VerifyEmailResponse:
     value = email_verify.token
-    verification = await fetch_verification_by_value(
-        value=value,
-        session=session,
-        should_fail=True,
-    )
+    verification = await fetch_verification_by_value(value=value, session=session)
+    if not verification:
+        raise CustomHttpException(
+            status_code=400, detail="Invalid email verification link."
+        )
 
     verification_type, target = VerificationIdentifier.parse(verification.identifier)
     if verification_type != VerificationType.EMAIL_VERIFICATION:
         raise CustomHttpException(
-            status_code=400, detail="Invalid email verification token."
+            status_code=400, detail="Invalid email verification link."
         )
 
     user = await fetch_user_by_email(email=target, session=session, should_fail=True)
-    if user.is_email_verified:
-        raise CustomHttpException(status_code=400, detail="Email is already verified.")
-
     user.is_email_verified = True
     session.add(user)
 
     await delete_verifications([verification], session)
 
     await session.commit()
-    return VerifyEmailResponse(detail="Email verification successful.")
+    return VerifyEmailResponse(detail=f"{user.email} has been verified.")
 
 
 @auth_router.post("/reset-password")
@@ -256,6 +253,7 @@ async def login(
 ) -> LoginResponse:
     email = user_login.email
     password = user_login.password
+    remember_me = user_login.remember_me
 
     user = await fetch_authenticated_user(
         email=email,
@@ -284,7 +282,7 @@ async def login(
         httponly=True,
         secure=True,
         samesite="lax",
-        max_age=settings.auth.session_expires_in,
+        max_age=settings.auth.session_expires_in if remember_me else None,
     )
     return LoginResponse(**UserResponse.model_construct(**user.__dict__).__dict__)
 

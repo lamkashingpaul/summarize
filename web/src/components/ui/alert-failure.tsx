@@ -7,17 +7,20 @@ import {
 import { cn } from "@/lib/utils";
 import { XCircleIcon } from "lucide-react";
 
-type AlertFailureProps = AlertProps & {
-  icon?: React.ReactNode;
-  title?: string;
-  description?: string;
+type AlertFailureProps = Omit<AlertProps, "title"> & {
+  icon?: React.ReactNode | null;
+  title?: string | null;
+  description?: string | null;
 };
 
 export const AlertFailure = (props: AlertFailureProps) => {
-  const { icon, title, description, className, ...rest } = props;
-
-  const alertIcon = icon || <XCircleIcon />;
-  const alertTitle = title || "Failure";
+  const {
+    icon = <XCircleIcon />,
+    title = "Failure",
+    description = "An error occurred.",
+    className,
+    ...rest
+  } = props;
 
   return (
     <Alert
@@ -25,9 +28,11 @@ export const AlertFailure = (props: AlertFailureProps) => {
       variant="default"
       {...rest}
     >
-      {alertIcon}
-      <AlertTitle>{alertTitle}</AlertTitle>
-      {description && <AlertDescription>{description}</AlertDescription>}
+      {icon !== null ? icon : null}
+      {title !== null ? <AlertTitle>{title}</AlertTitle> : null}
+      {description !== null ? (
+        <AlertDescription>{description}</AlertDescription>
+      ) : null}
     </Alert>
   );
 };
