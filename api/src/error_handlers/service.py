@@ -36,14 +36,14 @@ def handle_custom_database_exception_for_http(e: Exception, passthrough: bool = 
             logger.error(e)
             raise CustomHttpException(
                 status_code=500,
-                detail="Internal Server Error",
+                detail="Internal Server Error.",
             ) from e
 
 
 async def custom_rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded):
     response = JSONResponse(
         status_code=429,
-        content={"detail": f"Rate limit exceeded: {exc.detail}"},
+        content={"detail": f"Rate limit exceeded: {exc.detail}."},
     )
     response = request.app.state.limiter._inject_headers(
         response, request.state.view_rate_limit
@@ -62,5 +62,5 @@ async def global_exception_handler(request: Request, exc: Exception):
     logger.error(exc)
     return JSONResponse(
         status_code=500,
-        content={"detail": "Internal Server Error"},
+        content={"detail": "Internal Server Error."},
     )

@@ -27,12 +27,12 @@ class RequestBodySizeLimiter(BaseHTTPMiddleware):
                     if int(content_length) > self.max_size_bytes:
                         raise CustomHttpException(
                             status_code=413,
-                            detail=f"Payload too large (max {self.max_size_bytes} bytes)",
+                            detail=f"Payload too large (max {self.max_size_bytes} bytes).",
                         )
                 except ValueError:
                     raise CustomHttpException(
                         400,
-                        "Invalid Content-Length header",
+                        "Invalid Content-Length header.",
                     )
 
             received_bytes = 0
@@ -50,7 +50,7 @@ class RequestBodySizeLimiter(BaseHTTPMiddleware):
 
                 if received_bytes > self.max_size_bytes:
                     raise CustomHttpException(
-                        status_code=413, detail="Streaming body exceeded size limit"
+                        status_code=413, detail="Streaming body exceeded size limit."
                     )
 
                 return message

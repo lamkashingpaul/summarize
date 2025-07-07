@@ -33,7 +33,7 @@ async def fetch_article_by_id(
     if len(articles) != 1:
         if should_fail:
             raise CustomDatabaseNotFoundException(
-                message=f"Article with id: {article_id} not found"
+                message=f"Article with id: {article_id} not found."
             )
         return None
 
@@ -57,7 +57,7 @@ async def fetch_article_by_url(
     if len(articles) != 1:
         if should_fail:
             raise CustomDatabaseNotFoundException(
-                message=f"Article with url: {url} not found"
+                message=f"Article with url: {url} not found."
             )
         return None
 

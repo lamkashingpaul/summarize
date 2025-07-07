@@ -60,7 +60,7 @@ async def fetch_user_by_email(
     if len(users) != 1:
         if should_fail:
             raise CustomDatabaseNotFoundException(
-                message=f"User with email: '{email}' not found"
+                message=f"User with email: '{email}' not found."
             )
         return None
 
@@ -82,7 +82,7 @@ async def fetch_authenticated_user(
     if not account:
         if should_fail:
             raise CustomDatabaseNotFoundException(
-                message=f"Credentials account with email '{email}' not found"
+                message=f"Credentials account with email '{email}' not found."
             )
         return None
 
@@ -93,7 +93,7 @@ async def fetch_authenticated_user(
     if hashed_password is None:
         if should_fail:
             raise CustomDatabaseNotFoundException(
-                message=f"Credentials account with email '{email}' has no password set"
+                message=f"Credentials account with email '{email}' has no password set."
             )
         return None
 
@@ -106,12 +106,12 @@ async def fetch_authenticated_user(
     except VerifyMismatchError as e:
         if should_fail:
             raise CustomDatabaseNotFoundException(
-                message="Invalid email or password"
+                message="Invalid email or password."
             ) from e
         return None
     except Exception as e:
         if should_fail:
             raise CustomDatabaseInternalServerErrorException(
-                message="An error occurred while verifying the password"
+                message="An error occurred while verifying the password."
             ) from e
         return None

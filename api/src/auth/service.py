@@ -106,7 +106,7 @@ async def fetch_verification_by_value(
     if len(verifications) != 1:
         if should_fail:
             raise CustomDatabaseNotFoundException(
-                message=f"Verification with value '{value}' not found"
+                message=f"Verification with value '{value}' not found."
             )
         return None
 
@@ -162,7 +162,7 @@ async def fetch_credentials_account_by_email(
     if len(accounts) != 1:
         if should_fail:
             raise CustomDatabaseNotFoundException(
-                message=f"Credentials account with email '{email}' not found"
+                message=f"Credentials account with email '{email}' not found."
             )
         return None
 
