@@ -32,6 +32,7 @@
     "NEXTAUTH",
     "nuqs",
     "onupdate",
+    "partialize",
     "pgadmin",
     "pgvector",
     "poolclass",

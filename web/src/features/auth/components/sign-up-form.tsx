@@ -86,7 +86,7 @@ export const SignUpForm = () => {
             <FormItem>
               <FormLabel>Name</FormLabel>
               <FormControl>
-                <Input placeholder="John Doe" {...field} />
+                <Input {...field} placeholder="John Doe" autoComplete="name" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -100,7 +100,11 @@ export const SignUpForm = () => {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="john.doe@example.com" {...field} />
+                <Input
+                  {...field}
+                  placeholder="john.doe@example.com"
+                  autoComplete="email"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -115,8 +119,9 @@ export const SignUpForm = () => {
               <FormLabel>Password</FormLabel>
               <FormControl>
                 <InputWithAnEye
-                  placeholder="Create a strong password"
                   {...field}
+                  placeholder="Create a strong password"
+                  autoComplete="new-password"
                 />
               </FormControl>
               <FormMessage />
@@ -132,8 +137,9 @@ export const SignUpForm = () => {
               <FormLabel>Confirm Password</FormLabel>
               <FormControl>
                 <InputWithAnEye
-                  placeholder="Confirm your password"
                   {...field}
+                  placeholder="Confirm your password"
+                  autoComplete="new-password"
                 />
               </FormControl>
               <FormMessage />
@@ -149,6 +155,7 @@ export const SignUpForm = () => {
               <FormLabel className="hover:bg-accent/50 flex w-full items-start gap-3 rounded-lg border p-3 has-[[aria-checked=true]]:border-blue-600 has-[[aria-checked=true]]:bg-blue-50 dark:has-[[aria-checked=true]]:border-blue-900 dark:has-[[aria-checked=true]]:bg-blue-950">
                 <FormControl>
                   <Checkbox
+                    name={field.name}
                     checked={field.value}
                     onCheckedChange={(checked) =>
                       field.onChange(checked as boolean)
@@ -190,6 +197,7 @@ export const SignUpForm = () => {
               <FormLabel className="hover:bg-accent/50 flex w-full items-start gap-3 rounded-lg border p-3 has-[[aria-checked=true]]:border-blue-600 has-[[aria-checked=true]]:bg-blue-50 dark:has-[[aria-checked=true]]:border-blue-900 dark:has-[[aria-checked=true]]:bg-blue-950">
                 <FormControl>
                   <Checkbox
+                    name={field.name}
                     checked={field.value}
                     onCheckedChange={(checked) =>
                       field.onChange(checked as boolean)

@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -10,8 +12,20 @@ import { SignInForm } from "@/features/auth/components/sign-in-form";
 import { SocialSignInForm } from "@/features/auth/components/social-sign-in-form";
 import { ArrowLeft, FileText } from "lucide-react";
 import Link from "next/link";
+import { useQueryState } from "nuqs";
+import { Suspense } from "react";
 
 export default function SignInPage() {
+  return (
+    <Suspense>
+      <SuspenseSignInPage />
+    </Suspense>
+  );
+}
+
+function SuspenseSignInPage() {
+  const [redirectTo] = useQueryState("redirectTo", { defaultValue: "/" });
+
   return (
     <section className="my-auto">
       <div className="container-wrapper !max-w-md">
@@ -56,7 +70,7 @@ export default function SignInPage() {
                 </div>
               </div>
 
-              <SignInForm />
+              <SignInForm redirectTo={redirectTo} />
 
               <div className="text-center text-sm">
                 <span className="text-muted-foreground">

@@ -21,12 +21,22 @@ import { formatErrorMessage } from "@/lib/utils";
 import { AlertSuccess } from "@/components/ui/alert-success";
 import { AlertFailure } from "@/components/ui/alert-failure";
 import { ButtonWithLoading } from "@/components/ui/button-with-loading";
-import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useBoundStore } from "@/stores";
 
 type SignInFormInput = z.input<typeof signInSchema>;
 type SignInFormOutput = z.output<typeof signInSchema>;
 
-export const SignInForm = () => {
+type SignInFormProps = {
+  redirectTo?: string;
+};
+
+export const SignInForm = (props: SignInFormProps) => {
+  const { redirectTo = "/" } = props;
+
+  const router = useRouter();
+  const loginUser = useBoundStore((state) => state.loginUser);
+
   const {
     mutateAsync: signIn,
     data: signInData,
@@ -43,38 +53,38 @@ export const SignInForm = () => {
     handleSubmit,
     control,
     setError,
-    reset,
-    formState: { errors, isSubmitSuccessful },
+    formState: { errors },
   } = form;
 
   const onSubmit: SubmitHandler<SignInFormOutput> = async (data) => {
     try {
-      await signIn(data);
+      const {
+        email,
+        name,
+        image_url: imageUrl,
+        is_email_verified: isEmailVerified,
+      } = await signIn(data);
+      loginUser({ email, name, imageUrl, isEmailVerified });
+      router.replace(redirectTo);
     } catch (error) {
       const errorMessage = formatErrorMessage(error);
       setError("root.serverError", { type: "server", message: errorMessage });
     }
   };
 
-  useEffect(() => {
-    if (isSubmitSuccessful) {
-      reset();
-    }
-  }, [isSubmitSuccessful, reset]);
-
   return (
     <Form {...form}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {signInData?.detail ? (
+        {signInData ? (
           <AlertSuccess
-            title="Account Created"
-            description={`${signInData.detail} Please check your email for verification instructions.`}
+            title="Sign In Successful"
+            description="You have successfully signed in. Redirecting..."
           />
         ) : null}
 
         {errors?.root?.serverError?.type === "server" ? (
           <AlertFailure
-            title="Sign Up Failed"
+            title="Sign In Failed"
             description={errors.root.serverError.message}
           />
         ) : null}
@@ -86,7 +96,11 @@ export const SignInForm = () => {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="Enter your email" {...field} />
+                <Input
+                  {...field}
+                  autoComplete="email"
+                  placeholder="Enter your email"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -100,7 +114,11 @@ export const SignInForm = () => {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <InputWithAnEye placeholder="Enter your password" {...field} />
+                <InputWithAnEye
+                  {...field}
+                  placeholder="Enter your password"
+                  autoComplete="current-password"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -115,6 +133,7 @@ export const SignInForm = () => {
               <FormItem className="flex items-center space-x-2">
                 <FormControl>
                   <Checkbox
+                    name={field.name}
                     checked={field.value}
                     onCheckedChange={field.onChange}
                   />
