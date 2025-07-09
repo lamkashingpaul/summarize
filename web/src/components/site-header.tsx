@@ -46,12 +46,8 @@ function AuthenticatedMenu({ user }: { user: AuthenticatedUser }) {
 
   return (
     <>
-      <ComingSoonButton asChild variant="ghost">
-        <Link href="/dashboard">Dashboard</Link>
-      </ComingSoonButton>
-      <ComingSoonButton asChild variant="ghost">
-        <Link href={`/users/me`}>{user.name}</Link>
-      </ComingSoonButton>
+      <ComingSoonButton variant="ghost">Dashboard</ComingSoonButton>
+      <ComingSoonButton variant="ghost">{user.name}</ComingSoonButton>
       <Button variant="outline" onClick={() => logoutUser()}>
         Sign Out
       </Button>
