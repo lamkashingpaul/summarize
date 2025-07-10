@@ -3,7 +3,7 @@ import { AskQuestionResponse } from "@/features/question-and-answers/types";
 import { customFetch } from "@/lib/axois";
 import { ReactQueryError } from "@/types";
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 type AskQuestionParamsDto = z.infer<typeof askQuestionSchema.shape.params>;
 type AskQuestionBodyDto = z.infer<typeof askQuestionSchema.shape.body>;

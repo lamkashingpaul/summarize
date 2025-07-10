@@ -1,7 +1,7 @@
 import axios, { AxiosError } from "axios";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 type PossibleZodErrorResponse = {
   name?: string;

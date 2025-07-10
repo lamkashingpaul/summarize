@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 
 export const verifyEmailSchema = z.object({
   token: z.string(),

@@ -18,7 +18,7 @@ import { formatErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 type ResetPasswordFormProps = {
   token: string;

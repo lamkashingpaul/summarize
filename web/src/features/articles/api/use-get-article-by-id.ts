@@ -8,7 +8,7 @@ import {
   UseQueryOptions,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 type GetArticleByIdParamsDto = z.infer<
   typeof getArticleByIdSchema.shape.params

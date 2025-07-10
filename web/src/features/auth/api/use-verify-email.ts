@@ -3,7 +3,7 @@ import { VerifyEmailResponse } from "@/features/auth/types";
 import { customFetch } from "@/lib/axois";
 import { ReactQueryError } from "@/types";
 import { useMutation } from "@tanstack/react-query";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 type VerifyEmailDto = z.output<typeof verifyEmailSchema>;
 

@@ -18,7 +18,7 @@ import { formatErrorMessage } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 type ForgotPasswordFormInput = z.input<typeof forgotPasswordSchema>;
 type ForgotPasswordFormOutput = z.output<typeof forgotPasswordSchema>;

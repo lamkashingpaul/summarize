@@ -2,7 +2,7 @@
 
 import { signInSchema } from "@/features/auth/schemas/sign-in.schema";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,

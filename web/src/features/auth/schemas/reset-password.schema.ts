@@ -1,5 +1,5 @@
 import { passwordSchema } from "@/features/auth/schemas/password.schema";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 export const resetPasswordSchema = z
   .object({

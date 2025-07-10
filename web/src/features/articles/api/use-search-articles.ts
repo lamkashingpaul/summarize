@@ -9,7 +9,7 @@ import {
   UseInfiniteQueryOptions,
 } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 type SearchArticlesQueryDto = z.input<typeof searchArticlesSchema.shape.query>;
 type SearchArticlesResponseData = SearchArticlesResponse;

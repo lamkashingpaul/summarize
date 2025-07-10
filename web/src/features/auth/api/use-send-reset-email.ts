@@ -3,7 +3,7 @@ import { SendResetEmailResponse } from "@/features/auth/types";
 import { customFetch } from "@/lib/axois";
 import { ReactQueryError } from "@/types";
 import { useMutation } from "@tanstack/react-query";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 type ForgotPasswordDto = z.output<typeof forgotPasswordSchema>;
 

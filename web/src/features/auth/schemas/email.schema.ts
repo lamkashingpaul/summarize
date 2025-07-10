@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 
 export const emailSchema = z
   .email({
@@ -9,4 +9,4 @@ export const emailSchema = z
       return "Invalid email address";
     },
   })
-  .min(1, "Email is required");
+  .transform((value) => value.toLowerCase());
