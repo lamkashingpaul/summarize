@@ -32,4 +32,8 @@ update:
 
 dev:
 	@echo "Starting both web and API development servers..."
-	@make dev-web & make dev-api
+	@trap 'kill -INT $$WEB_PID $$API_PID 2>/dev/null; wait $$WEB_PID $$API_PID 2>/dev/null' INT TERM; \
+	make dev-web & WEB_PID=$$!; \
+	make dev-api & API_PID=$$!; \
+	wait $$WEB_PID $$API_PID; \
+	trap - INT TERM

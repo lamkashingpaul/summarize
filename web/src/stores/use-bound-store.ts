@@ -1,4 +1,4 @@
-import { createSessionSlice } from "@/features/auth/slices/session.slice";
+import { createSessionSlice } from "@/features/auth/slices";
 import { SessionSlice } from "@/features/auth/types";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
